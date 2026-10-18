@@ -258,7 +258,7 @@
       setScreen("CHAT");
     }
 
-    async function sendChat(text) {
+    async function sendChat(msgText) {
       const inputEl = document.getElementById("chat-input");
       const text = (msgText || (inputEl ? inputEl.value : "")).trim();
       if (!text) return;
