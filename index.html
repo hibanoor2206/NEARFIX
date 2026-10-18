@@ -258,21 +258,94 @@
       setScreen("CHAT");
     }
 
-    function sendChat(msgText) {
+    async function sendChat(text) {
       const inputEl = document.getElementById("chat-input");
       const text = (msgText || (inputEl ? inputEl.value : "")).trim();
       if (!text) return;
-      if (text === "Confirm Booking") {
-        const w = state.selectedWorker || WORKERS[0];
-        const newId = "NF-" + Math.floor(1000 + Math.random() * 9000);
-        state.bookings.unshift({ id: newId, workerId: w.id, workerName: w.name, category: w.catLabel, problem: state.searchQuery || "Home repair dispatch", address: "Absor, Turbat", slot: "Today ASAP", pkr: w.hourlyRatePkr, status: "ACCEPTED" });
-        state.chatMessages.push({ sender: "USER", text: "Confirm Booking" });
-        state.chatMessages.push({ sender: "WORKER", text: `Salam! This is ${w.name}. Booking #${newId} accepted! I am departing from ${w.area} now. Tap 'Track on Live Map' to watch my route checkpoints tick live!`, quickReplies: ["Track on Live Map"] });
-        state.trackingStep = 0;
-        render();
-        showToast(`Booking #${newId} confirmed with ${w.name}!`);
-        return;
-      }
+      
+if (text === "Confirm Booking") {
+  const w = state.selectedWorker || WORKERS[0];
+
+  const customerName = prompt("Enter customer name:");
+  if (!customerName || !customerName.trim()) {
+    alert("Customer name is required.");
+    return;
+  }
+
+  const customerPhone = prompt("Enter customer phone number:");
+  if (!customerPhone || !customerPhone.trim()) {
+    alert("Customer phone number is required.");
+    return;
+  }
+
+  const customerAddress = prompt(
+    "Enter customer address:",
+    "Absor, Turbat"
+  );
+
+  if (!customerAddress || !customerAddress.trim()) {
+    alert("Customer address is required.");
+    return;
+  }
+
+  const newId = "NF-" + Math.floor(1000 + Math.random() * 9000);
+
+  try {
+    const { error } = await supabaseClient
+      .from("bookings")
+      .insert({
+        fixer_id: String(w.id),
+        fixer_name_snapshot: w.name,
+        category_snapshot: w.catLabel,
+        estimated_rate_pkr: Number(w.hourlyRatePkr) || 0,
+        customer_name: customerName.trim(),
+        customer_phone: customerPhone.trim(),
+        address: customerAddress.trim(),
+        problem: state.searchQuery || "Home repair dispatch",
+        preferred_slot: "Today ASAP",
+        status: "PENDING"
+      });
+
+    if (error) {
+      console.error("Supabase booking error:", error);
+      alert("Booking save nahi hui: " + error.message);
+      return;
+    }
+
+    state.bookings.unshift({
+      id: newId,
+      workerId: w.id,
+      workerName: w.name,
+      category: w.catLabel,
+      problem: state.searchQuery || "Home repair dispatch",
+      address: customerAddress.trim(),
+      slot: "Today ASAP",
+      pkr: Number(w.hourlyRatePkr) || 0,
+      status: "PENDING"
+    });
+
+    state.chatMessages.push({
+      sender: "USER",
+      text: "Confirm Booking"
+    });
+
+    state.chatMessages.push({
+      sender: "WORKER",
+      text: `Your booking #${newId} has been submitted successfully. ${w.name} is your selected fixer. Booking status: Pending confirmation.`,
+      quickReplies: []
+    });
+
+    state.trackingStep = 0;
+    render();
+    showToast(`Booking #${newId} submitted successfully!`);
+
+  } catch (err) {
+    console.error("Booking error:", err);
+    alert("Booking save nahi hui. Please try again.");
+  }
+
+  return;
+}
       if (text === "Track on Live Map") {
         setScreen("MAP");
         return;
