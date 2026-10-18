@@ -13,10 +13,7 @@
       "sb_publishable_ygPCB_LTX9K1dZnGULbdxQ_tMVf2tkc"
     );
   </script>
-</head>
 
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>NEARFIX — AI-Powered Local Skilled Trade Matching (Turbat &amp; Pakistan)</title>
   <meta name="description" content="AI-powered local skilled trade matching for emergency repair, plumbing, electrical, AC, laptops, and painting across Turbat, Balochistan and Pakistan." />
   <style>
@@ -71,7 +68,7 @@
     .hero-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
     .hero-pill { background: var(--solar-amber); color: var(--primary-dark); font-size: 10px; font-weight: 900; padding: 4px 8px; border-radius: 8px; }
     .hero-loc { background: rgba(255,255,255,0.2); color: #fff; font-size: 11px; font-weight: 700; padding: 4px 8px; border-radius: 8px; }
-    .hero- banner h1 { font-size: 22px; font-weight: 900; line-height: 1.2; margin-bottom: 4px; }
+    .hero-banner h1 { font-size: 22px; font-weight: 900; line-height: 1.2; margin-bottom: 4px; }
     .worker-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 14px; }
     .worker-card { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 16px; display: flex; flex-direction: column; justify-content: space-between; }
     .worker-top { display: flex; gap: 12px; align-items: center; }
@@ -228,6 +225,7 @@
     };
 
     let state = {
+      currentUser: null,
       role: "CUSTOMER",
       screen: "SEARCH",
       lang: "ROMAN_URDU",
@@ -262,14 +260,223 @@
       alert("How NEARFIX AI Works:\n\n1. AI Problem-to-Service Search: Understands Balochi, Urdu, Roman Urdu & English to diagnose root cause, urgency, and fair Turbat PKR rates.\n2. Smart Worker Ranking: Deterministic score based on Rating, Completed Jobs, Distance in km, Availability & Admin Verification.\n3. Live Route Radar: Tracks where the technician is coming from and ticks every checkpoint until reaching your doorstep.");
     }
 
-    function setRole(role) {
-      state.role = role;
-      document.getElementById("role-customer").className = "role-btn" + (role === "CUSTOMER" ? " active-customer" : "");
-      document.getElementById("role-worker").className = "role-btn" + (role === "WORKER" ? " active-worker" : "");
-      document.getElementById("role-admin").className = "role-btn" + (role === "ADMIN" ? " active-admin" : "");
-      document.getElementById("customer-bottom-nav").style.display = role === "CUSTOMER" ? "flex" : "none";
-      render();
+   
+let authMode = "login";
+
+function openAuth(mode) {
+  authMode = mode;
+  const modal = document.getElementById("auth-modal");
+  modal.style.display = "flex";
+  updateAuthForm();
+  document.getElementById("auth-error").textContent = "";
+}
+
+function closeAuth() {
+  document.getElementById("auth-modal").style.display = "none";
+}
+
+function toggleAuthMode() {
+  authMode = authMode === "login" ? "signup" : "login";
+  updateAuthForm();
+  document.getElementById("auth-error").textContent = "";
+}
+
+function updateAuthForm() {
+  const signup = authMode === "signup";
+
+  document.getElementById("auth-title").textContent =
+    signup ? "Create your NEARFIX account" : "Welcome to NEARFIX";
+
+  document.getElementById("auth-subtitle").textContent =
+    signup ? "Join NEARFIX as a customer or worker." : "Login to continue.";
+
+  document.getElementById("auth-name-group").style.display =
+    signup ? "block" : "none";
+
+  document.getElementById("auth-phone-group").style.display =
+    signup ? "block" : "none";
+
+  document.getElementById("auth-role-group").style.display =
+    signup ? "block" : "none";
+
+  document.getElementById("auth-full-name").required = signup;
+  document.getElementById("auth-phone").required = signup;
+
+  document.getElementById("auth-password").autocomplete =
+    signup ? "new-password" : "current-password";
+
+  document.getElementById("auth-submit-btn").textContent =
+    signup ? "Create Account" : "Login";
+
+  document.getElementById("auth-switch-text").textContent =
+    signup ? "Already have an account?" : "New to NEARFIX?";
+
+  document.getElementById("auth-switch-btn").textContent =
+    signup ? "Login" : "Create account";
+}
+
+async function submitAuth(event) {
+  event.preventDefault();
+
+  const errorBox = document.getElementById("auth-error");
+  const submitButton = document.getElementById("auth-submit-btn");
+
+  errorBox.textContent = "";
+  submitButton.disabled = true;
+
+  try {
+    const email = document.getElementById("auth-email").value.trim();
+    const password = document.getElementById("auth-password").value;
+
+    if (authMode === "signup") {
+      const fullName =
+        document.getElementById("auth-full-name").value.trim();
+      const phone =
+        document.getElementById("auth-phone").value.trim();
+      const role =
+        document.getElementById("auth-role").value;
+
+      if (!fullName || !phone) {
+        throw new Error("Please enter your full name and phone number.");
+      }
+
+      const { data, error } = await supabaseClient.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: fullName,
+            phone: phone,
+            role: role
+          }
+        }
+      });
+
+      if (error) throw error;
+
+      if (data.session) {
+        await loadAuthenticatedUser(data.session);
+        closeAuth();
+      } else {
+        errorBox.textContent =
+          "Account created. Please check your email to confirm your account, then log in.";
+      }
+    } else {
+      const { data, error } = await supabaseClient.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (error) throw error;
+
+      await loadAuthenticatedUser(data.session);
+      closeAuth();
     }
+  } catch (error) {
+    errorBox.textContent = error.message || "Authentication failed.";
+  } finally {
+    submitButton.disabled = false;
+  }
+}
+
+async function loadAuthenticatedUser(session) {
+  if (!session?.user) return;
+
+  const { data: profile, error } = await supabaseClient
+    .from("profiles")
+    .select("id, full_name, phone, role")
+    .eq("id", session.user.id)
+    .single();
+
+  if (error) {
+    throw new Error(
+      "Login succeeded, but your profile could not be loaded. " +
+      error.message
+    );
+  }
+
+  const role = String(profile.role || "").toUpperCase();
+
+  if (!["CUSTOMER", "WORKER", "ADMIN"].includes(role)) {
+    throw new Error("Your account has an invalid role. Please contact support.");
+  }
+
+  state.currentUser = {
+    id: session.user.id,
+    email: session.user.email,
+    full_name: profile.full_name,
+    phone: profile.phone,
+    role: role
+  };
+
+  setRole(role);
+
+  document.getElementById("auth-user-label").textContent =
+    profile.full_name || session.user.email || "Logged in";
+
+  document.getElementById("auth-login-btn").style.display = "none";
+  document.getElementById("auth-signup-btn").style.display = "none";
+  document.getElementById("auth-logout-btn").style.display = "inline-block";
+}
+
+function setRole(role) {
+  // Role is taken from the signed-in user's database profile.
+  if (!state.currentUser || state.currentUser.role !== role) {
+    return;
+  }
+
+  state.role = role;
+
+  const nav = document.getElementById("customer-bottom-nav");
+  if (nav) {
+    nav.style.display = role === "CUSTOMER" ? "flex" : "none";
+  }
+
+  render();
+}
+
+async function logoutUser() {
+  const { error } = await supabaseClient.auth.signOut();
+
+  if (error) {
+    alert("Logout failed: " + error.message);
+    return;
+  }
+
+  state.currentUser = null;
+  state.role = "CUSTOMER";
+
+  document.getElementById("auth-user-label").textContent = "Not logged in";
+  document.getElementById("auth-login-btn").style.display = "inline-block";
+  document.getElementById("auth-signup-btn").style.display = "inline-block";
+  document.getElementById("auth-logout-btn").style.display = "none";
+
+  document.getElementById("customer-bottom-nav").style.display = "flex";
+
+  closeAuth();
+  render();
+}
+
+// Restore an existing login when the page is refreshed.
+async function restoreAuthSession() {
+  const { data, error } = await supabaseClient.auth.getSession();
+
+  if (error) {
+    console.error("Could not restore login:", error.message);
+    return;
+  }
+
+  if (data.session) {
+    try {
+      await loadAuthenticatedUser(data.session);
+    } catch (error) {
+      console.error("Could not load user profile:", error.message);
+    }
+  }
+}
+
+restoreAuthSession();
+
 
     function setScreen(scr) {
       state.screen = scr;
@@ -323,55 +530,48 @@
       
 if (text === "Confirm Booking") {
   const w = state.selectedWorker || WORKERS[0];
+  const user = state.currentUser;
 
-  const customerName = prompt("Enter customer name:");
-  if (!customerName || !customerName.trim()) {
-    alert("Customer name is required.");
+  if (!user) {
+    openAuth("login");
+    showToast("Please log in before confirming a booking.");
+    return;
+  }
+  if (user.role !== "CUSTOMER") {
+    alert("Only customer accounts can create repair bookings.");
     return;
   }
 
-  const customerPhone = prompt("Enter customer phone number:");
-  if (!customerPhone || !customerPhone.trim()) {
-    alert("Customer phone number is required.");
-    return;
-  }
-
-  const customerAddress = prompt(
-    "Enter customer address:",
-    "Absor, Turbat"
-  );
-
+  const customerAddress = prompt("Enter your repair address:", "Absor, Turbat");
   if (!customerAddress || !customerAddress.trim()) {
     alert("Customer address is required.");
     return;
   }
 
-  const newId = "NF-" + Math.floor(1000 + Math.random() * 9000);
-
   try {
-    const { error } = await supabaseClient
+    const { data: savedBooking, error } = await supabaseClient
       .from("bookings")
       .insert({
+        customer_id: user.id,
         fixer_id: String(w.id),
         fixer_name_snapshot: w.name,
         category_snapshot: w.catLabel,
         estimated_rate_pkr: Number(w.hourlyRatePkr) || 0,
-        customer_name: customerName.trim(),
-        customer_phone: customerPhone.trim(),
+        customer_name: user.full_name || "NEARFIX Customer",
+        phone: user.phone || "",
         address: customerAddress.trim(),
         problem: state.searchQuery || "Home repair dispatch",
         preferred_slot: "Today ASAP",
         status: "PENDING"
-      });
+      })
+      .select("id, status")
+      .single();
 
-    if (error) {
-      console.error("Supabase booking error:", error);
-      alert("Booking save nahi hui: " + error.message);
-      return;
-    }
+    if (error) throw error;
 
+    const bookingId = savedBooking?.id || ("NF-" + Math.floor(1000 + Math.random() * 9000));
     state.bookings.unshift({
-      id: newId,
+      id: bookingId,
       workerId: w.id,
       workerName: w.name,
       category: w.catLabel,
@@ -379,29 +579,22 @@ if (text === "Confirm Booking") {
       address: customerAddress.trim(),
       slot: "Today ASAP",
       pkr: Number(w.hourlyRatePkr) || 0,
-      status: "PENDING"
+      status: savedBooking?.status || "PENDING"
     });
 
-    state.chatMessages.push({
-      sender: "USER",
-      text: "Confirm Booking"
-    });
-
+    state.chatMessages.push({ sender: "USER", text: "Confirm Booking" });
     state.chatMessages.push({
       sender: "WORKER",
-      text: `Your booking #${newId} has been submitted successfully. ${w.name} is your selected fixer. Booking status: Pending confirmation.`,
+      text: `Your booking #${bookingId} has been submitted successfully. ${w.name} is your selected fixer. Booking status: Pending confirmation.`,
       quickReplies: []
     });
-
     state.trackingStep = 0;
     render();
-    showToast(`Booking #${newId} submitted successfully!`);
-
+    showToast(`Booking #${bookingId} submitted successfully!`);
   } catch (err) {
-    console.error("Booking error:", err);
-    alert("Booking save nahi hui. Please try again.");
+    console.error("Supabase booking error:", err);
+    alert("Booking save nahi hui: " + (err.message || "Please try again."));
   }
-
   return;
 }
       if (text === "Track on Live Map") {
