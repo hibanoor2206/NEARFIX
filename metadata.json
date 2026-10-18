@@ -1,0 +1,6 @@
+{
+  "name": "NEARFIX",
+  "description": "AI-powered local skilled trade matching for emergency repair, plumbing, electrical, AC, laptops, and painting across Pakistan.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

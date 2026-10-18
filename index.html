@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NEARFIX — AI-Powered Local Skilled Trade Matching (Turbat &amp; Pakistan)</title>
+  <meta name="description" content="AI-powered local skilled trade matching for emergency repair, plumbing, electrical, AC, laptops, and painting across Turbat, Balochistan and Pakistan." />
+  <style>
+    :root {
+      --primary-royal: #1E3A8A;
+      --primary-dark: #0B1120;
+      --primary-light: #DBEAFE;
+      --solar-amber: #F59E0B;
+      --solar-amber-light: #FEF3C7;
+      --emerald: #059669;
+      --emerald-light: #D1FAE5;
+      --ai-violet: #7C3AED;
+      --ai-violet-light: #EDE9FE;
+      --coral: #E11D48;
+      --coral-light: #FFE4E6;
+      --bg: #F8FAFC;
+      --surface: #FFFFFF;
+      --border: #E2E8F0;
+      --text: #0F172A;
+      --muted: #64748B;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif; }
+    body { background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+    .app-shell { max-width: 960px; width: 100%; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; background: var(--bg); }
+    header { background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 40; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand-logo { width: 40px; height: 40px; border-radius: 50%; background: var(--primary-royal); color: var(--solar-amber); display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 18px; }
+    .brand-title { display: flex; align-items: center; gap: 6px; font-weight: 900; font-size: 20px; color: var(--primary-royal); letter-spacing: 0.4px; }
+    .ai-badge { background: var(--solar-amber-light); color: #B45309; font-size: 11px; font-weight: 900; padding: 2px 6px; border-radius: 6px; }
+    .brand-sub { font-size: 11px; color: var(--muted); }
+    .role-bar { display: flex; gap: 8px; padding: 8px 16px; background: #F1F5F9; border-top: 1px solid var(--border); }
+    .role-btn { flex: 1; padding: 8px 10px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); font-size: 12px; font-weight: 700; color: var(--text); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: 0.15s; }
+    .role-btn.active-customer { background: var(--primary-royal); color: #fff; border-color: var(--primary-royal); }
+    .role-btn.active-worker { background: var(--ai-violet); color: #fff; border-color: var(--ai-violet); }
+    .role-btn.active-admin { background: var(--coral); color: #fff; border-color: var(--coral); }
+    main { flex: 1; padding: 16px; padding-bottom: 88px; }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 16px; margin-bottom: 16px; box-shadow: 0 2px 6px rgba(15,23,42,0.03); }
+    .card-highlight { border: 1.5px solid var(--primary-light); }
+    .lang-row, .chip-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin: 10px 0; }
+    .chip { white-space: nowrap; padding: 6px 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--surface); font-size: 12px; font-weight: 600; cursor: pointer; color: var(--text); }
+    .chip.active { background: var(--primary-royal); color: #fff; border-color: var(--primary-royal); font-weight: 800; }
+    .search-input-wrap { display: flex; gap: 8px; margin-top: 8px; }
+    .search-input { flex: 1; padding: 13px 16px; border-radius: 14px; border: 1.5px solid var(--border); background: #F8FAFC; font-size: 14px; outline: none; }
+    .search-input:focus { border-color: var(--primary-royal); background: #fff; }
+    .btn { width: 100%; padding: 13px 16px; border-radius: 14px; border: none; font-size: 14px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.15s; }
+    .btn-primary { background: var(--primary-royal); color: #fff; }
+    .btn-violet { background: var(--ai-violet); color: #fff; }
+    .btn-emerald { background: var(--emerald); color: #fff; }
+    .btn-outline { background: #fff; color: var(--primary-royal); border: 1px solid var(--border); }
+    .hero-banner { background: linear-gradient(135deg, #0B1120 0%, #1E3A8A 65%, #0F766E 100%); color: #fff; border-radius: 22px; padding: 20px; margin-bottom: 16px; position: relative; overflow: hidden; }
+    .hero-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .hero-pill { background: var(--solar-amber); color: var(--primary-dark); font-size: 10px; font-weight: 900; padding: 4px 8px; border-radius: 8px; }
+    .hero-loc { background: rgba(255,255,255,0.2); color: #fff; font-size: 11px; font-weight: 700; padding: 4px 8px; border-radius: 8px; }
+    .hero- banner h1 { font-size: 22px; font-weight: 900; line-height: 1.2; margin-bottom: 4px; }
+    .worker-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 14px; }
+    .worker-card { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 16px; display: flex; flex-direction: column; justify-content: space-between; }
+    .worker-top { display: flex; gap: 12px; align-items: center; }
+    .avatar { width: 48px; height: 48px; border-radius: 50%; background: var(--primary-light); color: var(--primary-royal); display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 16px; flex-shrink: 0; border: 2px solid var(--primary-royal); }
+    .badge-verified { background: var(--primary-light); color: var(--primary-royal); font-size: 9px; font-weight: 900; padding: 2px 5px; border-radius: 4px; margin-left: 4px; }
+    .badge-avail { background: var(--emerald-light); color: #065F46; font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 6px; }
+    .ai-reason-box { background: #F0F9FF; border: 1px solid #BAE6FD; border-radius: 12px; padding: 10px; margin: 10px 0; font-size: 12px; color: #0C4A6E; line-height: 1.4; }
+    .worker-actions { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; gap: 8px; }
+    .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); border-top: 1px solid var(--border); display: flex; justify-content: center; z-index: 40; }
+    .bottom-nav-inner { max-width: 960px; width: 100%; display: flex; }
+    .nav-item { flex: 1; padding: 10px 4px; text-align: center; font-size: 11px; font-weight: 700; color: var(--muted); cursor: pointer; border: none; background: none; }
+    .nav-item.active { color: var(--primary-royal); font-weight: 900; background: #EFF6FF; }
+    .radar-box { background: #0F172A; color: #fff; border-radius: 20px; overflow: hidden; margin-bottom: 16px; }
+    .radar-header { background: #1E293B; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-weight: 800; }
+    .radar-canvas-wrap { position: relative; height: 260px; background: radial-gradient(circle at center, #1E293B 0%, #0F172A 100%); }
+    .checkpoint-row { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 14px; border: 1px solid var(--border); background: var(--surface); margin-bottom: 8px; cursor: pointer; }
+    .checkpoint-row.ticked { background: #ECFDF5; border-color: #6EE7B7; }
+    .checkpoint-row.current { background: var(--solar-amber-light); border-color: var(--solar-amber); border-width: 1.5px; }
+    .tick-circle { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 13px; background: #E2E8F0; color: var(--muted); flex-shrink: 0; }
+    .tick-circle.done { background: var(--emerald); color: #fff; }
+    .chat-box { display: flex; flex-direction: column; height: calc(100vh - 210px); min-height: 440px; background: var(--surface); border-radius: 20px; border: 1px solid var(--border); overflow: hidden; }
+    .chat-messages { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 12px; }
+    .msg { max-width: 82%; padding: 12px 14px; border-radius: 16px; font-size: 13px; line-height: 1.45; }
+    .msg-ai { background: #F1F5F9; color: var(--text); align-self: flex-start; border-bottom-left-radius: 4px; }
+    .msg-user { background: var(--primary-royal); color: #fff; align-self: flex-end; border-bottom-right-radius: 4px; }
+    .msg-worker { background: #ECFDF5; color: #065F46; border: 1px solid #A7F3D0; align-self: flex-start; }
+    .chat-input-bar { display: flex; gap: 8px; padding: 10px; border-top: 1px solid var(--border); background: var(--surface); }
+    .toast { position: fixed; bottom: 72px; left: 50%; transform: translateX(-50%); background: #0F172A; color: #fff; padding: 10px 18px; border-radius: 999px; font-size: 12px; font-weight: 700; z-index: 100; display: none; box-shadow: 0 6px 20px rgba(0,0,0,0.25); }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header>
+      <div class="topbar">
+        <div class="brand">
+          <div class="brand-logo">🔧</div>
+          <div>
+            <div class="brand-title">NEARFIX <span class="ai-badge">AI ⚡</span></div>
+            <div class="brand-sub">Turbat &amp; Pakistan • ماہر کاریگر</div>
+          </div>
+        </div>
+        <button class="chip" onclick="showHowAiWorks()">ℹ️ How AI Works</button>
+      </div>
+      <div class="role-bar">
+        <button id="role-customer" class="role-btn active-customer" onclick="setRole('CUSTOMER')">👤 Customer View</button>
+        <button id="role-worker" class="role-btn" onclick="setRole('WORKER')">👷 Worker Demo</button>
+        <button id="role-admin" class="role-btn" onclick="setRole('ADMIN')">🛡️ Admin Demo</button>
+      </div>
+    </header>
+
+    <main id="main-content"></main>
+
+    <nav class="bottom-nav" id="customer-bottom-nav">
+      <div class="bottom-nav-inner">
+        <button class="nav-item active" id="nav-search" onclick="setScreen('SEARCH')">🔍 Search</button>
+        <button class="nav-item" id="nav-chat" onclick="setScreen('CHAT')">💬 AI Chatbot</button>
+        <button class="nav-item" id="nav-workers" onclick="setScreen('WORKERS')">👥 Workers</button>
+        <button class="nav-item" id="nav-map" onclick="setScreen('MAP')">📍 Live Map</button>
+        <button class="nav-item" id="nav-bookings" onclick="setScreen('BOOKINGS')">📋 Bookings</button>
+      </div>
+    </nav>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    const WORKERS = [
+      { id: "w_elec_1", name: "Ustad Ghulam Sarwar", category: "ELECTRICIAN", catLabel: "Electrician", urdu: "بجلی کا کام", title: "Master Electrician & UPS/Solar Specialist", area: "Main Bazaar, Turbat", distanceKm: 0.8, rating: 4.9, reviewCount: 142, hourlyRatePkr: 1200, isAvailableNow: true, isVerifiedByAdmin: true, cnicMasked: "52203-*******-7", phone: "+92 321 8234110", experienceYears: 14, skills: ["Short Circuit Repair", "3-Phase Wiring", "Solar Inverter Setup"], totalJobsCompleted: 380, aiMatchReason: "Closest master electrician in Main Bazaar (0.8 km), carries clamp meter & high-draw breakers, 99% 5-star rating." },
+      { id: "w_elec_2", name: "Nadeem Baloch", category: "ELECTRICIAN", catLabel: "Electrician", urdu: "بجلی کا کام", title: "Residential & Commercial Wireman", area: "Absor, Turbat", distanceKm: 2.4, rating: 4.7, reviewCount: 89, hourlyRatePkr: 900, isAvailableNow: true, isVerifiedByAdmin: true, cnicMasked: "52203-*******-3", phone: "+92 333 7812904", experienceYears: 8, skills: ["Ceiling Fan Repair", "DB Box Replacement", "Generator Changeover"], totalJobsCompleted: 210, aiMatchReason: "High-speed emergency call response in Absor sector, budget-friendly hourly rate." },
+      { id: "w_ac_1", name: "Kareem Dad Rind", category: "AC_REPAIR", catLabel: "AC Repair", urdu: "اے سی سروس", title: "Inverter AC Diagnostic & PCB Board Expert", area: "Absor Chowk, Turbat", distanceKm: 1.9, rating: 4.95, reviewCount: 184, hourlyRatePkr: 1800, isAvailableNow: true, isVerifiedByAdmin: true, cnicMasked: "52203-*******-5", phone: "+92 312 9948201", experienceYears: 12, skills: ["R410A/R32 Gas Charging", "DC Inverter PCB", "Deep Chemical Jet Wash"], totalJobsCompleted: 430, aiMatchReason: "Top-ranked AC specialist for harsh 48°C Kech summers, carries digital manifold gauges & inverter testing gear." },
+      { id: "w_ac_2", name: "Yasir Hameed", category: "AC_REPAIR", catLabel: "AC Repair", urdu: "اے سی سروس", title: "Split AC & Refrigerator Technician", area: "Main Bazaar, Turbat", distanceKm: 1.1, rating: 4.6, reviewCount: 76, hourlyRatePkr: 1300, isAvailableNow: true, isVerifiedByAdmin: true, cnicMasked: "52203-*******-1", phone: "+92 300 3829104", experienceYears: 6, skills: ["Capacitor Replacement", "Copper Pipe Brazing", "Water Drain Leakage"], totalJobsCompleted: 175, aiMatchReason: "Quick service within 45 mins in Turbat central, excellent for capacitor & water leakage fixes." },
+      { id: "w_plum_1", name: "Ustad Barkat Ali", category: "PLUMBING", catLabel: "Plumbing", urdu: "پلمبر", title: "Sanitary Master & PPRC Pipeline Specialist", area: "Kech River Road, Turbat", distanceKm: 1.4, rating: 4.9, reviewCount: 115, hourlyRatePkr: 1000, isAvailableNow: true, isVerifiedByAdmin: true, cnicMasked: "52203-*******-2", phone: "+92 323 7192039", experienceYears: 16, skills: ["PPRC Pipe Welding", "Water Tank Float Valve", "Concealed Leakage"], totalJobsCompleted: 320, aiMatchReason: "Expert in concealed wall leaks and underground Kech water piping, 100% leak-proof track record." },
+      { id: "w_lap_1", name: "Engr. Zubair Dashti", category: "LAPTOP_TECH", catLabel: "Laptop & PC", urdu: "کمپیوٹر مرمت", title: "Chip-Level Laptop Motherboard & Display Specialist", area: "Computer Market, Main Road, Turbat", distanceKm: 0.6, rating: 4.95, reviewCount: 210, hourlyRatePkr: 1500, isAvailableNow: true, isVerifiedByAdmin: true, cnicMasked: "52203-*******-6", phone: "+92 313 8847291", experienceYears: 9, skills: ["BGA Chip Reballing", "Black Screen Diagnostics", "BIOS Reprogramming"], totalJobsCompleted: 510, aiMatchReason: "Top laptop engineer in Turbat with dedicated SMD hot-air rework station & microscope." },
+      { id: "w_pnt_1", name: "Ustad Mehboob Baloch", category: "PAINTER", catLabel: "Painter", urdu: "رنگ و روغن", title: "WeatherSheet & Interior Texture Artisan", area: "Danuk, Turbat", distanceKm: 2.9, rating: 4.9, reviewCount: 74, hourlyRatePkr: 1100, isAvailableNow: true, isVerifiedByAdmin: true, cnicMasked: "52203-*******-3", phone: "+92 335 9182736", experienceYears: 18, skills: ["Dampness / Seep Treatment", "Sun-Resistant WeatherCoat", "Wall Putty"], totalJobsCompleted: 260, aiMatchReason: "Master artisan specializing in humidity seepage treatment and heat-reflective roof coats." },
+      { id: "w_hnd_1", name: "Shah Mir Bugti", category: "GENERAL_HANDYMAN", catLabel: "Handyman", urdu: "عام کاریگر", title: "Multi-skilled Home Maintenance & Assembly Tech", area: "Airport Road, Turbat", distanceKm: 3.2, rating: 4.75, reviewCount: 105, hourlyRatePkr: 900, isAvailableNow: true, isVerifiedByAdmin: true, cnicMasked: "52201-*******-8", phone: "+92 320 8912743", experienceYears: 9, skills: ["Door Lock Cylinder", "Curtain Rods", "Furniture Assembly"], totalJobsCompleted: 290, aiMatchReason: "Reliable all-in-one handyman for diverse household fixes in a single visit." }
+    ];
+
+    const PRESETS = {
+      ROMAN_URDU: [
+        "💻 Laptop screen black hai lights on hain",
+        "❄️ AC cooling nahi kar raha aur ajeeb awaz hai",
+        "⚡ Main breaker spark kar raha hai aur trip ho gaya",
+        "🚰 Underground water tank pipe leak ho raha hai",
+        "🎨 Deewar par seelan aur paint gir raha hai"
+      ],
+      URDU: [
+        "💻 لیپ ٹاپ آن ہوتا ہے مگر اسکرین بلیک رہتی ہے",
+        "❄️ اے سی سے ٹھنڈی ہوا نہیں آرہی اور پانی ٹپک رہا ہے",
+        "⚡ مین ڈی بی بریکر بار بار ٹرپ ہو رہا ہے",
+        "🚰 پانی کی پائپ لائن لیک ہے"
+      ],
+      BALOCHI: [
+        "💻 لیپ ٹاپ ءِ اسکرین تہار اِنت بلے پنکھا چریت",
+        "❄️ کولر آپ نہ بارت ءُ گرمیں گْوات کشیت",
+        "⚡ بجلی ءِ بورڈ ترپیت ءُ فیوز سُچیت"
+      ],
+      ENGLISH: [
+        "💻 Laptop powers on fans spin but display stays black",
+        "❄️ AC compressor humming loudly but blowing warm air",
+        "⚡ Main electrical circuit breaker sparking and tripping",
+        "🚰 Water supply pipe burst with high pressure leak"
+      ]
+    };
+
+    let state = {
+      role: "CUSTOMER",
+      screen: "SEARCH",
+      lang: "ROMAN_URDU",
+      searchQuery: "",
+      selectedCategory: null,
+      diagnosis: null,
+      selectedWorker: WORKERS[0],
+      bookings: [
+        { id: "NF-7821", workerId: "w_elec_1", workerName: "Ustad Ghulam Sarwar", category: "Electrician", problem: "Main DB circuit breaker tripping repeatedly", address: "Near Mir Chakar Fort, Absor, Turbat", slot: "Today ASAP", pkr: 1500, status: "ACCEPTED" }
+      ],
+      chatMessages: [
+        { sender: "AI", text: "Salam! I am your NEARFIX AI Problem Advisor & Skilled Worker Matchmaker. Describe any repair issue in English, Roman Urdu, Urdu, or Balochi — I will diagnose the root cause, give safety advice, and guide you to the best-matched skilled technician in Turbat!", quickReplies: ["AC cooling nahi kar raha", "Laptop screen stays black", "Main breaker sparks & trips", "Confirm Booking"] }
+      ],
+      trackingStep: 1,
+      checkpoints: [
+        { step: 0, title: "Departed Worker Hub (Coming From ✓)", landmark: "Main Bazaar, Turbat", sub: "Verified tools & departed hub", x: 16, y: 76 },
+        { step: 1, title: "Joined Main Turbat Road Corridor", landmark: "Cinema Chowk & Central Market", sub: "Passed main market intersection", x: 35, y: 58 },
+        { step: 2, title: "Passing Mid-Route Landmark", landmark: "D.H.Q Hospital / Commissioner Rd", sub: "Halfway checkpoint • GPS verified", x: 55, y: 45 },
+        { step: 3, title: "Entering Customer Neighborhood", landmark: "Sector Gate • Absor, Turbat", sub: "Less than 300m away", x: 73, y: 32 },
+        { step: 4, title: "Worker Reached Destination ✓", landmark: "Near Mir Chakar Fort, Absor, Turbat", sub: "Arrived at customer doorstep", x: 86, y: 20 }
+      ]
+    };
+
+    function showToast(msg) {
+      const el = document.getElementById("toast");
+      el.textContent = msg;
+      el.style.display = "block";
+      setTimeout(() => { el.style.display = "none"; }, 2800);
+    }
+
+    function showHowAiWorks() {
+      alert("How NEARFIX AI Works:\n\n1. AI Problem-to-Service Search: Understands Balochi, Urdu, Roman Urdu & English to diagnose root cause, urgency, and fair Turbat PKR rates.\n2. Smart Worker Ranking: Deterministic score based on Rating, Completed Jobs, Distance in km, Availability & Admin Verification.\n3. Live Route Radar: Tracks where the technician is coming from and ticks every checkpoint until reaching your doorstep.");
+    }
+
+    function setRole(role) {
+      state.role = role;
+      document.getElementById("role-customer").className = "role-btn" + (role === "CUSTOMER" ? " active-customer" : "");
+      document.getElementById("role-worker").className = "role-btn" + (role === "WORKER" ? " active-worker" : "");
+      document.getElementById("role-admin").className = "role-btn" + (role === "ADMIN" ? " active-admin" : "");
+      document.getElementById("customer-bottom-nav").style.display = role === "CUSTOMER" ? "flex" : "none";
+      render();
+    }
+
+    function setScreen(scr) {
+      state.screen = scr;
+      ["SEARCH","CHAT","WORKERS","MAP","BOOKINGS"].forEach(s => {
+        const btn = document.getElementById("nav-" + s.toLowerCase());
+        if (btn) btn.className = "nav-item" + (s === scr ? " active" : "");
+      });
+      render();
+    }
+
+    function diagnoseQuery(q) {
+      const text = (q || state.searchQuery || "").trim();
+      if (!text) { showToast("Please type or tap a repair problem first."); return; }
+      state.searchQuery = text;
+      const lower = text.toLowerCase();
+      if (lower.includes("laptop") || lower.includes("screen") || lower.includes("لیپ ٹاپ") || lower.includes("کمپیوٹر")) {
+        state.diagnosis = { category: "LAPTOP_TECH", catName: "Laptop & PC (کمپیوٹر مرمت)", urgency: "Moderate", cause: "RAM contact oxidation, internal LVDS display flex ribbon loose, or backlight IC issue.", minPkr: 1200, maxPkr: 3200, safety: "Disconnect charger immediately if laptop feels hot." };
+        state.selectedCategory = "LAPTOP_TECH";
+      } else if (lower.includes("ac") || lower.includes("cooling") || lower.includes("کولر") || lower.includes("اے سی")) {
+        state.diagnosis = { category: "AC_REPAIR", catName: "AC Repair (اے سی سروس)", urgency: "High Priority", cause: "Weak 45uF running capacitor (common in 45°C+ Turbat heat) or R410A gas pressure drop.", minPkr: 1500, maxPkr: 5000, safety: "Switch off the outdoor AC breaker if compressor hums loudly." };
+        state.selectedCategory = "AC_REPAIR";
+      } else if (lower.includes("pipe") || lower.includes("water") || lower.includes("leak") || lower.includes("پانی") || lower.includes("نل")) {
+        state.diagnosis = { category: "PLUMBING", catName: "Plumbing (پلمبر)", urgency: "Normal", cause: "Punctured PPRC joint or degraded mixer valve washer.", minPkr: 700, maxPkr: 2400, safety: "Close the main overhead water tank gate valve to stop water loss." };
+        state.selectedCategory = "PLUMBING";
+      } else if (lower.includes("paint") || lower.includes("deewar") || lower.includes("دیوار") || lower.includes("رنگ")) {
+        state.diagnosis = { category: "PAINTER", catName: "Painter (رنگ و روغن)", urgency: "Standard", cause: "Wall surface flaking caused by subsoil dampness/seepage.", minPkr: 2500, maxPkr: 7500, safety: "Keep room ventilated during primer & weather-coat application." };
+        state.selectedCategory = "PAINTER";
+      } else {
+        state.diagnosis = { category: "ELECTRICIAN", catName: "Electrician (بجلی کا کام)", urgency: "Emergency", cause: "Loose neutral wire in main DB board or overloaded 32A MCB circuit breaker.", minPkr: 800, maxPkr: 2800, safety: "CRITICAL: Turn off the main double-pole isolator switch outside immediately." };
+        state.selectedCategory = "ELECTRICIAN";
+      }
+      render();
+      showToast("Gemini AI Diagnosis complete!");
+    }
+
+    function bookWorker(workerId) {
+      const w = WORKERS.find(x => x.id === workerId) || WORKERS[0];
+      state.selectedWorker = w;
+      state.chatMessages.push({
+        sender: "AI",
+        text: `Matched ${w.name} (${w.title} • ${w.area}). Estimated rate: PKR ${w.hourlyRatePkr}/hr. Tap 'Confirm Booking' to dispatch and track on the Live Map!`,
+        quickReplies: ["Main Bazaar, Turbat", "Absor, Turbat", "Confirm Booking", "Track on Live Map"]
+      });
+      setScreen("CHAT");
+    }
+
+    function sendChat(msgText) {
+      const inputEl = document.getElementById("chat-input");
+      const text = (msgText || (inputEl ? inputEl.value : "")).trim();
+      if (!text) return;
+      if (text === "Confirm Booking") {
+        const w = state.selectedWorker || WORKERS[0];
+        const newId = "NF-" + Math.floor(1000 + Math.random() * 9000);
+        state.bookings.unshift({ id: newId, workerId: w.id, workerName: w.name, category: w.catLabel, problem: state.searchQuery || "Home repair dispatch", address: "Absor, Turbat", slot: "Today ASAP", pkr: w.hourlyRatePkr, status: "ACCEPTED" });
+        state.chatMessages.push({ sender: "USER", text: "Confirm Booking" });
+        state.chatMessages.push({ sender: "WORKER", text: `Salam! This is ${w.name}. Booking #${newId} accepted! I am departing from ${w.area} now. Tap 'Track on Live Map' to watch my route checkpoints tick live!`, quickReplies: ["Track on Live Map"] });
+        state.trackingStep = 0;
+        render();
+        showToast(`Booking #${newId} confirmed with ${w.name}!`);
+        return;
+      }
+      if (text === "Track on Live Map") {
+        setScreen("MAP");
+        return;
+      }
+      state.chatMessages.push({ sender: "USER", text });
+      diagnoseQuery(text);
+      const matched = WORKERS.filter(w => !state.selectedCategory || w.category === state.selectedCategory)[0] || WORKERS[0];
+      state.selectedWorker = matched;
+      state.chatMessages.push({
+        sender: "AI",
+        text: `Diagnosed as ${state.diagnosis.catName}: ${state.diagnosis.cause}\n\nRecommended Expert: ${matched.name} (${matched.rating}★, ${matched.distanceKm} km away in ${matched.area}) — ${matched.aiMatchReason}`,
+        quickReplies: ["Confirm Booking", "Track on Live Map", "Main Bazaar, Turbat"]
+      });
+      render();
+    }
+
+    function renderSearch() {
+      const filtered = WORKERS.filter(w => !state.selectedCategory || w.category === state.selectedCategory);
+      const presets = PRESETS[state.lang] || PRESETS.ROMAN_URDU;
+      return `
+        <div class="card card-highlight">
+          <div style="font-weight:900;font-size:16px;">⚡ What is the issue at home or shop?</div>
+          <div style="font-size:12px;color:var(--muted);">Type naturally in Balochi, Urdu, Roman Urdu, or English</div>
+          <div class="lang-row">
+            ${["ROMAN_URDU","URDU","BALOCHI","ENGLISH"].map(l => `<button class="chip ${state.lang===l?'active':''}" onclick="state.lang='${l}';render()">${l.replace('_',' ')}</button>`).join("")}
+          </div>
+          <div class="search-input-wrap">
+            <input id="search-box" class="search-input" value="${state.searchQuery.replace(/"/g,'&quot;')}" oninput="state.searchQuery=this.value" placeholder="e.g. laptop screen black hai or AC cooling nahi kar raha..." />
+          </div>
+          <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
+            <button class="btn btn-primary" style="flex:1;" onclick="diagnoseQuery()">✨ Find a Fixer ⚡</button>
+            <button class="btn btn-violet" style="flex:1;" onclick="setScreen('CHAT')">💬 Talk to AI Chatbot &amp; Guide to Skilled Worker</button>
+          </div>
+          <div class="chip-row" style="margin-top:12px;">
+            ${presets.map(p => `<button class="chip" onclick="diagnoseQuery('${p.replace(/'/g,"\\'")}')">${p}</button>`).join("")}
+          </div>
+        </div>
+
+        ${state.diagnosis ? `
+          <div class="card" style="border:1.5px solid var(--ai-violet);">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <strong style="color:var(--ai-violet);font-size:16px;">✨ AI Diagnostic: ${state.diagnosis.catName}</strong>
+              <span class="ai-badge">${state.diagnosis.urgency}</span>
+            </div>
+            <p style="font-size:13px;margin:8px 0;"><strong>Root Cause:</strong> ${state.diagnosis.cause}</p>
+            <p style="font-size:14px;font-weight:900;color:var(--emerald);">Turbat Fair Market Estimate: PKR ${state.diagnosis.minPkr} – ${state.diagnosis.maxPkr}</p>
+            <p style="font-size:12px;color:var(--coral);margin-top:6px;">⚠️ <strong>Safety Tip:</strong> ${state.diagnosis.safety}</p>
+          </div>
+        ` : ""}
+
+        <div class="hero-banner">
+          <div class="hero-top">
+            <span class="hero-pill">✨ GEMINI AI POWERED</span>
+            <span class="hero-loc">Turbat &amp; Panjgur • تربت</span>
+          </div>
+          <h1>Instant Local Fixers &amp; Fair-Price Diagnostics</h1>
+          <div style="font-size:12px;opacity:0.9;">Electricians • AC Technicians • Laptops • Plumbers • Painters</div>
+        </div>
+
+        <div style="display:flex;justify-content:space-between;align-items:center;margin:12px 0 8px;">
+          <strong style="font-size:16px;">Explore Trade Categories</strong>
+          ${state.selectedCategory ? `<button class="chip" onclick="state.selectedCategory=null;render()">Show All (${WORKERS.length})</button>` : ""}
+        </div>
+        <div class="chip-row">
+          <button class="chip ${!state.selectedCategory?'active':''}" onclick="state.selectedCategory=null;render()">All Fixers (${WORKERS.length})</button>
+          <button class="chip ${state.selectedCategory==='ELECTRICIAN'?'active':''}" onclick="state.selectedCategory='ELECTRICIAN';render()">⚡ Electrician</button>
+          <button class="chip ${state.selectedCategory==='AC_REPAIR'?'active':''}" onclick="state.selectedCategory='AC_REPAIR';render()">❄️ AC Repair</button>
+          <button class="chip ${state.selectedCategory==='LAPTOP_TECH'?'active':''}" onclick="state.selectedCategory='LAPTOP_TECH';render()">💻 Laptop &amp; PC</button>
+          <button class="chip ${state.selectedCategory==='PLUMBING'?'active':''}" onclick="state.selectedCategory='PLUMBING';render()">🚰 Plumbing</button>
+          <button class="chip ${state.selectedCategory==='PAINTER'?'active':''}" onclick="state.selectedCategory='PAINTER';render()">🎨 Painter</button>
+        </div>
+
+        <h3 style="margin:12px 0;">Top Matched Fixers in Turbat (${filtered.length})</h3>
+        <div class="worker-grid">
+          ${filtered.map(w => `
+            <div class="worker-card">
+              <div>
+                <div class="worker-top">
+                  <div class="avatar">${w.name.split(" ").map(x=>x[0]).slice(0,2).join("")}</div>
+                  <div style="flex:1;">
+                    <div style="font-weight:900;font-size:15px;">${w.name} ${w.isVerifiedByAdmin?'<span class="badge-verified">VETTED</span>':''}</div>
+                    <div style="font-size:12px;color:var(--muted);">${w.title}</div>
+                    <div style="font-size:12px;color:var(--text);margin-top:2px;">📍 ${w.distanceKm} km • ${w.area}</div>
+                  </div>
+                  <div style="text-align:right;">
+                    <div style="font-weight:900;color:#B45309;">★ ${w.rating}</div>
+                    <span class="badge-avail">● Available</span>
+                  </div>
+                </div>
+                <div class="ai-reason-box">✨ <strong>Why matched:</strong> ${w.aiMatchReason}</div>
+              </div>
+              <div class="worker-actions">
+                <div>
+                  <div style="font-size:10px;color:var(--muted);">Turbat Rate</div>
+                  <div style="font-weight:900;font-size:15px;color:var(--primary-royal);">PKR ${w.hourlyRatePkr}/hr</div>
+                </div>
+                <div style="display:flex;gap:6px;">
+                  <button class="chip" onclick="state.selectedWorker=WORKERS.find(x=>x.id==='${w.id}');setScreen('MAP')">📍 Map</button>
+                  <a class="chip" href="tel:${w.phone}" style="text-decoration:none;">📞 Call</a>
+                  <button class="chip active" onclick="bookWorker('${w.id}')">Book via AI</button>
+                </div>
+              </div>
+            </div>
+          `).join("")}
+        </div>
+      `;
+    }
+
+    function renderChat() {
+      const w = state.selectedWorker || WORKERS[0];
+      return `
+        <div class="chat-box">
+          <div style="padding:12px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
+            <div>
+              <div style="font-weight:900;font-size:15px;">🤖 AI Problem &amp; Skill Advisor</div>
+              <div style="font-size:11px;color:var(--emerald);font-weight:700;">Matched Expert: ${w.name} • ${w.area}</div>
+            </div>
+            <button class="chip" onclick="setScreen('MAP')">📍 Live Map ✓</button>
+          </div>
+          <div class="chat-messages">
+            ${state.chatMessages.map(m => `
+              <div class="msg ${m.sender==='USER'?'msg-user':(m.sender==='WORKER'?'msg-worker':'msg-ai')}">
+                <div style="white-space:pre-line;">${m.text}</div>
+                ${m.quickReplies ? `<div class="chip-row" style="margin-top:8px;">${m.quickReplies.map(r => `<button class="chip" onclick="sendChat('${r.replace(/'/g,"\\'")}')">${r}</button>`).join("")}</div>` : ""}
+              </div>
+            `).join("")}
+          </div>
+          <div class="chat-input-bar">
+            <input id="chat-input" class="search-input" placeholder="Describe your problem or ask for a skilled worker..." onkeydown="if(event.key==='Enter')sendChat()" />
+            <button class="btn btn-primary" style="width:auto;padding:0 20px;" onclick="sendChat()">Send ➤</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderMap() {
+      const w = state.selectedWorker || WORKERS[0];
+      const cp = state.checkpoints[state.trackingStep] || state.checkpoints[0];
+      const reached = state.trackingStep >= state.checkpoints.length - 1;
+      return `
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+            <div>
+              <div style="font-weight:900;font-size:16px;">${w.name} ✓</div>
+              <div style="font-size:12px;color:var(--muted);">${w.title} • ${w.phone}</div>
+            </div>
+            <div style="display:flex;gap:8px;">
+              <a class="chip" href="tel:${w.phone}" style="text-decoration:none;">📞 Call</a>
+              <button class="chip active" onclick="setScreen('CHAT')">💬 Chat</button>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+            <div style="background:#ECFDF5;border:1px solid #6EE7B7;padding:10px;border-radius:12px;">
+              <div style="font-size:10px;font-weight:900;color:#065F46;">✓ COMING FROM</div>
+              <div style="font-weight:800;font-size:13px;margin-top:2px;">${w.area}</div>
+              <div style="font-size:11px;color:#047857;">Departed Hub • Ticked ✓</div>
+            </div>
+            <div style="background:${reached?'#059669':'#FEF3C7'};color:${reached?'#fff':'#92400E'};border:1px solid #F59E0B;padding:10px;border-radius:12px;">
+              <div style="font-size:10px;font-weight:900;">✓ ${reached?'REACHED HOME ✓':'LAST REACHED ✓'}</div>
+              <div style="font-weight:800;font-size:13px;margin-top:2px;">${cp.landmark}</div>
+              <div style="font-size:11px;">Step ${state.trackingStep+1}/${state.checkpoints.length} Ticked ✓</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="radar-box">
+          <div class="radar-header">
+            <span>🛰️ TURBAT LIVE ROUTE RADAR</span>
+            <span style="background:${reached?'var(--emerald)':'var(--primary-royal)'};padding:4px 10px;border-radius:999px;font-size:10px;">
+              ${reached ? 'REACHED DESTINATION ✓' : `STEP ${state.trackingStep+1}/${state.checkpoints.length} • EN ROUTE`}
+            </span>
+          </div>
+          <div class="radar-canvas-wrap">
+            ${state.checkpoints.map((pt, idx) => `
+              <div onclick="state.trackingStep=${idx};render()" style="position:absolute;left:${pt.x}%;top:${pt.y}%;transform:translate(-50%,-50%);cursor:pointer;text-align:center;">
+                <div style="background:${idx===state.trackingStep?'#F59E0B':(idx<=state.trackingStep?'#059669':'#1E293B')};color:${idx===state.trackingStep?'#000':'#fff'};font-size:9px;font-weight:900;padding:2px 6px;border-radius:6px;white-space:nowrap;margin-bottom:3px;">
+                  ${idx===0?'Origin ✓':(idx===state.checkpoints.length-1?'Customer Home':`Point #${idx+1}`)}
+                </div>
+                <div style="width:24px;height:24px;border-radius:50%;margin:0 auto;background:${idx<=state.trackingStep?'#059669':'#334155'};border:2px solid #fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;">
+                  ${idx<=state.trackingStep?'✓':idx+1}
+                </div>
+              </div>
+            `).join("")}
+          </div>
+          <div style="padding:10px 14px;background:#151C2C;display:flex;gap:8px;">
+            <button class="btn btn-primary" style="flex:1;padding:9px;" onclick="if(state.trackingStep<state.checkpoints.length-1){state.trackingStep++;render();showToast('Ticked next checkpoint!');}">⏭️ Tick Next Point</button>
+            <button class="btn btn-emerald" style="flex:1;padding:9px;" onclick="state.trackingStep=state.checkpoints.length-1;render();showToast('Worker Reached Destination ✓');">✅ Tick Reached ✓</button>
+            <button class="btn btn-outline" style="width:auto;padding:9px 14px;" onclick="state.trackingStep=0;render();">🔄 Reset</button>
+          </div>
+        </div>
+
+        <h3 style="margin-bottom:10px;">Worker Journey Checkpoints (${state.trackingStep+1}/${state.checkpoints.length} Ticked ✓)</h3>
+        ${state.checkpoints.map((pt, idx) => `
+          <div class="checkpoint-row ${idx===state.trackingStep?'current':(idx<state.trackingStep?'ticked':'')}" onclick="state.trackingStep=${idx};render()">
+            <div class="tick-circle ${idx<=state.trackingStep?'done':''}">${idx<=state.trackingStep?'✓':idx+1}</div>
+            <div style="flex:1;">
+              <div style="font-weight:800;font-size:13px;">${pt.title}</div>
+              <div style="font-size:12px;color:var(--primary-royal);font-weight:700;">📍 ${pt.landmark}</div>
+              <div style="font-size:11px;color:var(--muted);">${pt.sub}</div>
+            </div>
+            <span class="ai-badge">${idx<=state.trackingStep?'Ticked ✓':'Pending'}</span>
+          </div>
+        `).join("")}
+      `;
+    }
+
+    function renderBookings() {
+      return `
+        <h3 style="margin-bottom:12px;">My Repair Requests (${state.bookings.length})</h3>
+        ${state.bookings.map(b => `
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <strong style="color:var(--primary-royal);">#${b.id}</strong>
+              <span class="badge-avail">${b.status}</span>
+            </div>
+            <div style="font-weight:800;font-size:15px;margin-top:4px;">${b.workerName} • ${b.category}</div>
+            <div style="font-size:12px;color:var(--muted);margin:4px 0;">${b.problem}</div>
+            <div style="font-size:12px;">📍 ${b.address} • 🕒 ${b.slot} • <strong>PKR ${b.pkr}</strong></div>
+            <div style="display:flex;gap:8px;margin-top:10px;">
+              <button class="btn btn-primary" style="flex:1;padding:9px;" onclick="setScreen('MAP')">📍 Track Route &amp; Ticks ✓</button>
+              <button class="btn btn-outline" style="width:auto;padding:9px 16px;" onclick="setScreen('CHAT')">💬 Chat</button>
+            </div>
+          </div>
+        `).join("")}
+      `;
+    }
+
+    function renderWorkerRole() {
+      const w = state.selectedWorker || WORKERS[0];
+      return `
+        <div class="card">
+          <div style="font-size:12px;color:var(--muted);font-weight:700;">WORKER SIMULATION MODE</div>
+          <h3 style="margin:4px 0 8px;">Logged-in Technician: ${w.name}</h3>
+          <div class="chip-row">
+            ${WORKERS.map(x => `<button class="chip ${x.id===w.id?'active':''}" onclick="state.selectedWorker=WORKERS.find(k=>k.id==='${x.id}');render()">${x.name}</button>`).join("")}
+          </div>
+          <p style="font-size:13px;margin-top:8px;">📍 Area: <strong>${w.area}</strong> | Rating: <strong>${w.rating} ★</strong> | Rate: <strong>PKR ${w.hourlyRatePkr}/hr</strong></p>
+        </div>
+        ${renderMap()}
+      `;
+    }
+
+    function renderAdminRole() {
+      return `
+        <div class="card">
+          <h3>🛡️ NEARFIX Admin &amp; Verification Portal (Turbat)</h3>
+          <p style="font-size:12px;color:var(--muted);margin-top:4px;">Verified Workers: ${WORKERS.filter(w=>w.isVerifiedByAdmin).length}/${WORKERS.length} • Active Dispatches: ${state.bookings.length}</p>
+        </div>
+        <div class="worker-grid">
+          ${WORKERS.map(w => `
+            <div class="worker-card">
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <div>
+                  <div style="font-weight:900;">${w.name}</div>
+                  <div style="font-size:11px;color:var(--muted);">CNIC: ${w.cnicMasked} • ${w.area}</div>
+                </div>
+                <button class="chip ${w.isVerifiedByAdmin?'active':''}" onclick="w=WORKERS.find(x=>x.id==='${w.id}');w.isVerifiedByAdmin=!w.isVerifiedByAdmin;render();showToast('Verification updated!');">
+                  ${w.isVerifiedByAdmin?'✓ Verified':'Unverified'}
+                </button>
+              </div>
+            </div>
+          `).join("")}
+        </div>
+      `;
+    }
+
+    function render() {
+      const main = document.getElementById("main-content");
+      if (state.role === "WORKER") { main.innerHTML = renderWorkerRole(); return; }
+      if (state.role === "ADMIN") { main.innerHTML = renderAdminRole(); return; }
+      if (state.screen === "CHAT") main.innerHTML = renderChat();
+      else if (state.screen === "WORKERS") main.innerHTML = renderSearch();
+      else if (state.screen === "MAP") main.innerHTML = renderMap();
+      else if (state.screen === "BOOKINGS") main.innerHTML = renderBookings();
+      else main.innerHTML = renderSearch();
+    }
+
+    render();
+  </script>
+</body>
+</html>
