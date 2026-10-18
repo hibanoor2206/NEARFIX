@@ -226,6 +226,8 @@
 
     let state = {
       currentUser: null,
+      workerProfile: null,
+      workerProfileLoaded: false,
       role: "CUSTOMER",
       screen: "SEARCH",
       lang: "ROMAN_URDU",
@@ -410,6 +412,7 @@ async function loadAuthenticatedUser(session) {
   };
 
   setRole(role);
+  if (role === "WORKER") { await loadWorkerProfile(); }
 
   document.getElementById("auth-user-label").textContent =
     profile.full_name || session.user.email || "Logged in";
@@ -824,19 +827,97 @@ if (text === "Confirm Booking") {
       `;
     }
 
+    async function loadWorkerProfile() {
+      if (!state.currentUser || state.currentUser.role !== "WORKER") return;
+      const { data, error } = await supabaseClient.from("worker_profiles")
+        .select("user_id, full_name, phone, category, skills, area, hourly_rate_pkr, is_available, profile_complete")
+        .eq("user_id", state.currentUser.id).maybeSingle();
+      if (error) {
+        console.error("Worker profile load error:", error.message);
+        state.workerProfile = null;
+      } else {
+        state.workerProfile = data;
+      }
+      state.workerProfileLoaded = true;
+      if (state.role === "WORKER") render();
+    }
+
     function renderWorkerRole() {
-      const w = state.selectedWorker || WORKERS[0];
+      const p = state.workerProfile || {};
+      const skills = Array.isArray(p.skills) ? p.skills : [];
+      const skillOptions = ["Electrician", "Plumber", "AC Technician", "Laptop & Computer Repair", "Mechanic", "Carpenter", "Painter", "Welder", "Solar Technician", "Appliance Repair"];
+      const selected = (skill) => skills.includes(skill) ? "checked" : "";
+      const setup = !state.workerProfileLoaded || !p.profile_complete;
       return `
         <div class="card">
-          <div style="font-size:12px;color:var(--muted);font-weight:700;">WORKER SIMULATION MODE</div>
-          <h3 style="margin:4px 0 8px;">Logged-in Technician: ${w.name}</h3>
-          <div class="chip-row">
-            ${WORKERS.map(x => `<button class="chip ${x.id===w.id?'active':''}" onclick="state.selectedWorker=WORKERS.find(k=>k.id==='${x.id}');render()">${x.name}</button>`).join("")}
-          </div>
-          <p style="font-size:13px;margin-top:8px;">📍 Area: <strong>${w.area}</strong> | Rating: <strong>${w.rating} ★</strong> | Rate: <strong>PKR ${w.hourlyRatePkr}/hr</strong></p>
+          <div style="font-size:12px;color:var(--muted);font-weight:800;">${setup ? "WORKER PROFILE SETUP" : "WORKER DASHBOARD"}</div>
+          <h2 style="margin:6px 0 4px;">${setup ? "Complete your fixer profile" : "My Worker Profile"}</h2>
+          <p style="font-size:13px;color:var(--muted);margin-bottom:14px;">Add your skills and service details so customers can find you. Your changes will be saved to Supabase.</p>
+          <form id="worker-profile-form" onsubmit="saveWorkerProfile(event)">
+            <label for="wp-name">Full name</label>
+            <input id="wp-name" required value="${escapeHtml(p.full_name || state.currentUser?.full_name || "")}" style="width:100%;padding:11px;border:1px solid var(--border);border-radius:10px;margin:5px 0 12px;" />
+            <label for="wp-phone">Phone number</label>
+            <input id="wp-phone" required value="${escapeHtml(p.phone || state.currentUser?.phone || "")}" style="width:100%;padding:11px;border:1px solid var(--border);border-radius:10px;margin:5px 0 12px;" />
+            <label for="wp-category">Main service / profession</label>
+            <select id="wp-category" required style="width:100%;padding:11px;border:1px solid var(--border);border-radius:10px;margin:5px 0 12px;">
+              <option value="">Select your main skill</option>
+              ${skillOptions.map(x=>`<option value="${x}" ${p.category===x?'selected':''}>${x}</option>`).join("")}
+            </select>
+            <label>All skills you provide</label>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;margin:8px 0 14px;">
+              ${skillOptions.map(x=>`<label style="display:flex;gap:8px;align-items:center;font-size:13px;background:#F8FAFC;padding:9px;border-radius:9px;"><input type="checkbox" name="wp-skills" value="${x}" ${selected(x)} /> ${x}</label>`).join("")}
+            </div>
+            <label for="wp-area">Service area / city</label>
+            <input id="wp-area" required placeholder="e.g. Absor, Turbat" value="${escapeHtml(p.area || "")}" style="width:100%;padding:11px;border:1px solid var(--border);border-radius:10px;margin:5px 0 12px;" />
+            <label for="wp-rate">Hourly rate (PKR)</label>
+            <input id="wp-rate" type="number" min="0" max="1000000" required value="${p.hourly_rate_pkr ?? ""}" placeholder="e.g. 900" style="width:100%;padding:11px;border:1px solid var(--border);border-radius:10px;margin:5px 0 12px;" />
+            <label style="display:flex;align-items:center;gap:9px;margin:4px 0 16px;"><input id="wp-available" type="checkbox" ${p.is_available !== false ? "checked" : ""}/> I am currently available for jobs</label>
+            <p id="wp-error" role="alert" style="color:#b42318;font-size:13px;white-space:pre-wrap;margin-bottom:8px;"></p>
+            <button class="btn btn-primary" type="submit">${setup ? "Save Profile & Continue" : "Save Profile Changes"}</button>
+          </form>
+          ${!setup ? `<p style="font-size:12px;color:var(--muted);margin-top:12px;">Profile saved. Use this form anytime to update your skills, rate, area or availability.</p>` : ""}
         </div>
+        <div class="card"><div style="font-size:12px;color:var(--muted);font-weight:800;">DEMO PREVIEW</div><h3 style="margin-top:5px;">Worker Simulation Mode</h3><p style="font-size:13px;color:var(--muted);margin-top:6px;">The technician route below is a demo simulation. Your profile information is saved separately to your account.</p></div>
         ${renderMap()}
       `;
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "").replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
+    }
+
+    async function saveWorkerProfile(event) {
+      event.preventDefault();
+      const errorBox = document.getElementById("wp-error");
+      errorBox.textContent = "";
+      if (!state.currentUser || state.currentUser.role !== "WORKER") {
+        errorBox.textContent = "Please log in with a worker account first."; return;
+      }
+      const skills = Array.from(document.querySelectorAll('input[name="wp-skills"]:checked')).map(el => el.value);
+      const category = document.getElementById("wp-category").value;
+      if (!skills.length) { errorBox.textContent = "Please select at least one skill."; return; }
+      if (!skills.includes(category)) skills.push(category);
+      const payload = {
+        user_id: state.currentUser.id,
+        full_name: document.getElementById("wp-name").value.trim(),
+        phone: document.getElementById("wp-phone").value.trim(),
+        category,
+        skills,
+        area: document.getElementById("wp-area").value.trim(),
+        hourly_rate_pkr: Number(document.getElementById("wp-rate").value),
+        is_available: document.getElementById("wp-available").checked,
+        profile_complete: true,
+        updated_at: new Date().toISOString()
+      };
+      const { data, error } = await supabaseClient.from("worker_profiles")
+        .upsert(payload, { onConflict: "user_id" })
+        .select("user_id, full_name, phone, category, skills, area, hourly_rate_pkr, is_available, profile_complete")
+        .single();
+      if (error) { errorBox.textContent = "Profile save nahi hui: " + error.message + " — pehle Supabase SQL setup run karein."; return; }
+      state.workerProfile = data;
+      state.workerProfileLoaded = true;
+      render();
+      showToast("Worker profile saved successfully!");
     }
 
     function renderAdminRole() {
