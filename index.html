@@ -465,7 +465,21 @@ textarea:focus-visible {
   }
 
   .worker-card {
-    padding: 16px;
+  
+.worker-card {
+    padding: 18px;
+    border-radius: 16px;
+    border: 1px solid #E5E7EB;
+    background: #FFFFFF;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+  }
+
+  .worker-card:hover {
+    box-shadow: 0 8px 22px rgba(15, 23, 42, 0.10);
+    transform: translateY(-2px);
+  }
+
   }
 
   .worker-actions {
