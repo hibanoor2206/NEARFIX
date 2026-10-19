@@ -1139,41 +1139,67 @@ select:focus-visible {
       { id: "w_hnd_1", name: "Shah Mir Bugti", category: "GENERAL_HANDYMAN", catLabel: "Handyman", urdu: "عام کاریگر", title: "Multi-skilled Home Maintenance & Assembly Tech", area: "Airport Road, Turbat", distanceKm: 3.2, rating: 4.75, reviewCount: 105, hourlyRatePkr: 900, isAvailableNow: true, isVerifiedByAdmin: true, cnicMasked: "52201-*******-8", phone: "+92 320 8912743", experienceYears: 9, skills: ["Door Lock Cylinder", "Curtain Rods", "Furniture Assembly"], totalJobsCompleted: 290, aiMatchReason: "Reliable all-in-one handyman for diverse household fixes in a single visit." }
     ];
 
-    // Registered workers are loaded from Supabase; demo workers remain as fallback.
+    // Supabase worker profiles are the persistent source for registered workers.
+    // The eight bundled demo workers remain a separate fallback and are never inserted into Supabase.
     let registeredWorkers = [];
-    function allWorkers() { return [...registeredWorkers, ...WORKERS]; }
+    let publicWorkersLoadError = "";
+    let publicWorkersLoading = true;
+    function allWorkers() {
+      const byId = new Map();
+      [...WORKERS, ...registeredWorkers].forEach(w => byId.set(String(w.id), w));
+      return [...byId.values()];
+    }
     function normalizeCategory(value) {
-      const v = String(value || '').toLowerCase();
-      if (v.includes('laptop') || v.includes('computer') || v.includes('pc')) return 'LAPTOP_TECH';
-      if (v.includes('ac') || v.includes('air condition')) return 'AC_REPAIR';
-      if (v.includes('plumb')) return 'PLUMBING';
-      if (v.includes('paint')) return 'PAINTER';
-      if (v.includes('electric')) return 'ELECTRICIAN';
-      if (v.includes('handyman') || v.includes('general')) return 'GENERAL_HANDYMAN';
+      const v = String(value || '').toLowerCase().replace(/[_-]+/g, ' ');
+      if (/laptop|computer|pc|desktop|notebook/.test(v)) return 'LAPTOP_TECH';
+      if (/air\s*condition|\bac\b|ac repair|hvac/.test(v)) return 'AC_REPAIR';
+      if (/plumb|pipe fitting/.test(v)) return 'PLUMBING';
+      if (/paint|painter/.test(v)) return 'PAINTER';
+      if (/electric|wireman|wiring/.test(v)) return 'ELECTRICIAN';
+      if (/handyman|general/.test(v)) return 'GENERAL_HANDYMAN';
       return String(value || '').toUpperCase().replace(/[^A-Z0-9]+/g, '_');
     }
+    function workerMatchesQuery(worker, query) {
+      const q = String(query || '').trim().toLowerCase();
+      if (!q) return true;
+      const haystack = [worker.name, worker.category, worker.catLabel, worker.title, worker.area,
+        ...(Array.isArray(worker.skills) ? worker.skills : [])].filter(Boolean).join(' ').toLowerCase();
+      const terms = q.split(/\s+/).filter(Boolean);
+      return terms.every(term => haystack.includes(term) ||
+        (term === 'laptop' && /computer|pc/.test(haystack)) ||
+        (term === 'computer' && /laptop|pc/.test(haystack)) ||
+        (term === 'plumber' && /plumbing|pipe/.test(haystack)) ||
+        (term === 'electrician' && /electric|wireman/.test(haystack)));
+    }
     async function loadPublicWorkers() {
+      publicWorkersLoading = true;
+      publicWorkersLoadError = "";
       try {
         const { data, error } = await supabaseClient.from('worker_profiles')
           .select('user_id, full_name, phone, category, skills, area, hourly_rate_pkr, is_available, profile_complete')
-          .eq('profile_complete', true).eq('is_available', true);
+          .eq('profile_complete', true);
         if (error) throw error;
-        registeredWorkers = (data || []).map(p => ({
-          id: p.user_id, userId: p.user_id, isRegisteredWorker: true,
-          name: p.full_name || 'NEARFIX Worker', category: normalizeCategory(p.category),
-          catLabel: p.category || 'Skilled Worker', title: (Array.isArray(p.skills) ? p.skills : []).join(', ') || p.category || 'Skilled Worker',
-          area: p.area || 'Turbat', distanceKm: null, rating: 0, reviewCount: 0,
-          hourlyRatePkr: Number(p.hourly_rate_pkr) || 0, isAvailableNow: p.is_available !== false,
-          isVerifiedByAdmin: false, phone: p.phone || '', skills: Array.isArray(p.skills) ? p.skills : [],
-          aiMatchReason: 'Registered NEARFIX worker; skill and service-area information comes from the saved profile.'
-        }));
-        if (state.selectedWorker && state.selectedWorker.isRegisteredWorker) {
+        registeredWorkers = (data || []).map(p => {
+          const skills = Array.isArray(p.skills) ? p.skills : (typeof p.skills === 'string' ? p.skills.split(',').map(x => x.trim()).filter(Boolean) : []);
+          return {
+            id: p.user_id, userId: p.user_id, isRegisteredWorker: true,
+            name: p.full_name || 'NEARFIX Worker', category: normalizeCategory(p.category),
+            catLabel: p.category || 'Skilled Worker', title: skills.join(', ') || p.category || 'Skilled Worker',
+            area: p.area || 'Turbat', distanceKm: null, rating: 0, reviewCount: 0,
+            hourlyRatePkr: Number(p.hourly_rate_pkr) || 0, isAvailableNow: p.is_available === true,
+            isVerifiedByAdmin: false, phone: p.phone || '', skills,
+            aiMatchReason: 'Registered NEARFIX worker; skills and service area are from the saved profile.'
+          };
+        });
+        if (state.selectedWorker?.isRegisteredWorker) {
           state.selectedWorker = registeredWorkers.find(w => w.id === state.selectedWorker.id) || state.selectedWorker;
         }
-        if (state.screen === 'SEARCH' || state.screen === 'WORKERS') render();
       } catch (e) {
-        console.error('Could not load registered workers:', e.message);
-        // Keep the demo worker list usable if the table/policy has not been configured yet.
+        publicWorkersLoadError = e.message || 'Unknown Supabase error';
+        console.error('Could not load registered workers:', e);
+      } finally {
+        publicWorkersLoading = false;
+        if (state.screen === 'SEARCH' || state.screen === 'WORKERS') render();
       }
     }
 
@@ -1398,6 +1424,7 @@ async function loadAuthenticatedUser(session) {
   setRole(role);
   if (role === "WORKER") { await loadWorkerProfile(); }
   if (role === "CUSTOMER") { await loadMyBookings(); }
+  await loadPublicWorkers();
 
   document.getElementById("auth-user-label").textContent =
     profile.full_name || session.user.email || "Logged in";
@@ -1432,7 +1459,11 @@ async function logoutUser() {
   }
 
   state.currentUser = null;
+  state.workerProfile = null;
+  state.workerProfileLoaded = false;
+  state.workerProfileError = "";
   state.role = "CUSTOMER";
+  await loadPublicWorkers();
 
   document.getElementById("auth-user-label").textContent = "Not logged in";
   document.getElementById("auth-login-btn").style.display = "inline-block";
@@ -1604,7 +1635,11 @@ if (text === "Confirm Booking") {
 
     function renderSearch() {
       const workers = allWorkers();
-      const filtered = workers.filter(w => !state.selectedCategory || normalizeCategory(w.category) === state.selectedCategory || (Array.isArray(w.skills) && w.skills.some(sk => normalizeCategory(sk) === state.selectedCategory)));
+      const filtered = workers.filter(w =>
+        (!state.selectedCategory || normalizeCategory(w.category) === state.selectedCategory ||
+          (Array.isArray(w.skills) && w.skills.some(sk => normalizeCategory(sk) === state.selectedCategory))) &&
+        workerMatchesQuery(w, state.searchQuery)
+      );
       const presets = PRESETS[state.lang] || PRESETS.ROMAN_URDU;
       return `
 <div class="hero-banner">
@@ -1648,7 +1683,7 @@ if (text === "Confirm Booking") {
 
         <div style="display:flex;justify-content:space-between;align-items:center;margin:12px 0 8px;">
           <strong style="font-size:16px;">Explore Trade Categories</strong>
-          ${state.selectedCategory ? `<button class="chip" onclick="state.selectedCategory=null;render()">Show All (${WORKERS.length})</button>` : ""}
+          ${state.selectedCategory ? `<button class="chip" onclick="state.selectedCategory=null;render()">Show All (${workers.length})</button>` : ""}
         </div>
         <div class="chip-row">
           <button class="chip ${!state.selectedCategory?'active':''}" onclick="state.selectedCategory=null;render()">All Fixers (${workers.length})</button>
@@ -1660,6 +1695,9 @@ if (text === "Confirm Booking") {
         </div>
 
         <h3 style="margin:12px 0;">Top Matched Fixers in Turbat (${filtered.length})</h3>
+        ${publicWorkersLoading ? '<p role="status" style="padding:10px;color:var(--muted);">Loading registered workers…</p>' : ''}
+        ${publicWorkersLoadError ? `<p role="alert" style="padding:10px;color:#B42318;background:#FEF3F2;border-radius:10px;margin:8px 0;">Could not load registered worker profiles from Supabase: ${escapeHtml(publicWorkersLoadError)}. Demo workers are still shown; registered workers may be missing until this is resolved.</p>` : ''}
+        ${!publicWorkersLoading && !publicWorkersLoadError && filtered.length === 0 ? '<p style="padding:12px;color:var(--muted);">No fixers match this search. Try another skill or clear the filters.</p>' : ''}
         <div class="worker-grid">
           ${filtered.map(w => `
             <div class="worker-card">
@@ -1673,10 +1711,11 @@ if (text === "Confirm Booking") {
                   </div>
                   <div style="text-align:right;">
                     <div style="font-weight:900;color:#B45309;">★ ${w.rating}</div>
-                    <span class="badge-avail">● Available</span>
+                    <span class="badge-avail">${w.isAvailableNow ? '● Available' : '● Currently unavailable'}</span>
                   </div>
                 </div>
                 <div class="ai-reason-box">✨ <strong>Why matched:</strong> ${w.aiMatchReason}</div>
+                ${w.skills?.length ? `<div style="font-size:12px;color:var(--muted);margin-top:6px;">Skills: ${w.skills.map(escapeHtml).join(', ')}</div>` : ''}
               </div>
               <div class="worker-actions">
                 <div>
@@ -1843,8 +1882,10 @@ if (text === "Confirm Booking") {
       if (error) {
         console.error("Worker profile load error:", error.message);
         state.workerProfile = null;
+        state.workerProfileError = error.message;
       } else {
         state.workerProfile = data;
+        state.workerProfileError = "";
       }
       state.workerProfileLoaded = true;
       if (state.role === "WORKER") render();
@@ -1880,6 +1921,7 @@ if (text === "Confirm Booking") {
             <label for="wp-rate">Hourly rate (PKR)</label>
             <input id="wp-rate" type="number" min="0" max="1000000" required value="${p.hourly_rate_pkr ?? ""}" placeholder="e.g. 900" style="width:100%;padding:11px;border:1px solid var(--border);border-radius:10px;margin:5px 0 12px;" />
             <label style="display:flex;align-items:center;gap:9px;margin:4px 0 16px;"><input id="wp-available" type="checkbox" ${p.is_available !== false ? "checked" : ""}/> I am currently available for jobs</label>
+            ${state.workerProfileError ? `<p role="alert" style="color:#b42318;font-size:13px;white-space:pre-wrap;margin-bottom:8px;">Could not load your saved profile: ${escapeHtml(state.workerProfileError)}</p>` : ''}
             <p id="wp-error" role="alert" style="color:#b42318;font-size:13px;white-space:pre-wrap;margin-bottom:8px;"></p>
             <button class="btn btn-primary" type="submit">${setup ? "Save Profile & Continue" : "Save Profile Changes"}</button>
           </form>
@@ -1905,6 +1947,14 @@ if (text === "Confirm Booking") {
       const category = document.getElementById("wp-category").value;
       if (!skills.length) { errorBox.textContent = "Please select at least one skill."; return; }
       if (!skills.includes(category)) skills.push(category);
+      const fullName = document.getElementById("wp-name").value.trim();
+      const phone = document.getElementById("wp-phone").value.trim();
+      const area = document.getElementById("wp-area").value.trim();
+      const rate = Number(document.getElementById("wp-rate").value);
+      if (!fullName || !phone || !area || !Number.isFinite(rate) || rate < 0) {
+        errorBox.textContent = "Enter a valid name, phone, service area, and non-negative hourly rate.";
+        return;
+      }
       const payload = {
         user_id: state.currentUser.id,
         full_name: document.getElementById("wp-name").value.trim(),
@@ -1917,16 +1967,27 @@ if (text === "Confirm Booking") {
         profile_complete: true,
         updated_at: new Date().toISOString()
       };
-      const { data, error } = await supabaseClient.from("worker_profiles")
-        .upsert(payload, { onConflict: "user_id" })
-        .select("user_id, full_name, phone, category, skills, area, hourly_rate_pkr, is_available, profile_complete")
-        .single();
-      if (error) { errorBox.textContent = "Profile save nahi hui: " + error.message + " — pehle Supabase SQL setup run karein."; return; }
-      state.workerProfile = data;
-      state.workerProfileLoaded = true;
-      await loadPublicWorkers();
-      render();
-      showToast("Worker profile saved successfully!");
+      const submitButton = document.querySelector('#worker-profile-form button[type="submit"]');
+      if (submitButton) { submitButton.disabled = true; submitButton.textContent = "Saving…"; }
+      try {
+        const { data, error } = await supabaseClient.from("worker_profiles")
+          .upsert(payload, { onConflict: "user_id" })
+          .select("user_id, full_name, phone, category, skills, area, hourly_rate_pkr, is_available, profile_complete")
+          .single();
+        if (error) throw error;
+        state.workerProfile = data;
+        state.workerProfileLoaded = true;
+        state.workerProfileError = "";
+        await loadPublicWorkers();
+        render();
+        showToast("Worker profile saved successfully!");
+      } catch (error) {
+        errorBox.textContent = "Profile save failed: " + (error.message || "Unknown Supabase error");
+        console.error("Worker profile save error:", error);
+      } finally {
+        const button = document.querySelector('#worker-profile-form button[type="submit"]');
+        if (button) { button.disabled = false; button.textContent = state.workerProfile?.profile_complete ? "Save Profile Changes" : "Save Profile & Continue"; }
+      }
     }
 
     function renderAdminRole() {
