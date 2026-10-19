@@ -8,6 +8,10 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script>
+    if (!window.supabase || !window.supabase.createClient) {
+      document.addEventListener('DOMContentLoaded', () => alert('NEARFIX could not load the Supabase library. Check your internet connection and refresh.'));
+      throw new Error('Supabase JavaScript library failed to load.');
+    }
     const supabaseClient = window.supabase.createClient(
       "https://dgtaatenphzyyzsknwcj.supabase.co",
       "sb_publishable_ygPCB_LTX9K1dZnGULbdxQ_tMVf2tkc"
@@ -197,6 +201,44 @@
       { id: "w_hnd_1", name: "Shah Mir Bugti", category: "GENERAL_HANDYMAN", catLabel: "Handyman", urdu: "عام کاریگر", title: "Multi-skilled Home Maintenance & Assembly Tech", area: "Airport Road, Turbat", distanceKm: 3.2, rating: 4.75, reviewCount: 105, hourlyRatePkr: 900, isAvailableNow: true, isVerifiedByAdmin: true, cnicMasked: "52201-*******-8", phone: "+92 320 8912743", experienceYears: 9, skills: ["Door Lock Cylinder", "Curtain Rods", "Furniture Assembly"], totalJobsCompleted: 290, aiMatchReason: "Reliable all-in-one handyman for diverse household fixes in a single visit." }
     ];
 
+    // Registered workers are loaded from Supabase; demo workers remain as fallback.
+    let registeredWorkers = [];
+    function allWorkers() { return [...registeredWorkers, ...WORKERS]; }
+    function normalizeCategory(value) {
+      const v = String(value || '').toLowerCase();
+      if (v.includes('laptop') || v.includes('computer') || v.includes('pc')) return 'LAPTOP_TECH';
+      if (v.includes('ac') || v.includes('air condition')) return 'AC_REPAIR';
+      if (v.includes('plumb')) return 'PLUMBING';
+      if (v.includes('paint')) return 'PAINTER';
+      if (v.includes('electric')) return 'ELECTRICIAN';
+      if (v.includes('handyman') || v.includes('general')) return 'GENERAL_HANDYMAN';
+      return String(value || '').toUpperCase().replace(/[^A-Z0-9]+/g, '_');
+    }
+    async function loadPublicWorkers() {
+      try {
+        const { data, error } = await supabaseClient.from('worker_profiles')
+          .select('user_id, full_name, phone, category, skills, area, hourly_rate_pkr, is_available, profile_complete')
+          .eq('profile_complete', true).eq('is_available', true);
+        if (error) throw error;
+        registeredWorkers = (data || []).map(p => ({
+          id: p.user_id, userId: p.user_id, isRegisteredWorker: true,
+          name: p.full_name || 'NEARFIX Worker', category: normalizeCategory(p.category),
+          catLabel: p.category || 'Skilled Worker', title: (Array.isArray(p.skills) ? p.skills : []).join(', ') || p.category || 'Skilled Worker',
+          area: p.area || 'Turbat', distanceKm: null, rating: 0, reviewCount: 0,
+          hourlyRatePkr: Number(p.hourly_rate_pkr) || 0, isAvailableNow: p.is_available !== false,
+          isVerifiedByAdmin: false, phone: p.phone || '', skills: Array.isArray(p.skills) ? p.skills : [],
+          aiMatchReason: 'Registered NEARFIX worker; skill and service-area information comes from the saved profile.'
+        }));
+        if (state.selectedWorker && state.selectedWorker.isRegisteredWorker) {
+          state.selectedWorker = registeredWorkers.find(w => w.id === state.selectedWorker.id) || state.selectedWorker;
+        }
+        if (state.screen === 'SEARCH' || state.screen === 'WORKERS') render();
+      } catch (e) {
+        console.error('Could not load registered workers:', e.message);
+        // Keep the demo worker list usable if the table/policy has not been configured yet.
+      }
+    }
+
     const PRESETS = {
       ROMAN_URDU: [
         "💻 Laptop screen black hai lights on hain",
@@ -357,6 +399,10 @@ async function submitAuth(event) {
       if (error) throw error;
 
       if (data.session) {
+        const { error: profileError } = await supabaseClient.from('profiles').upsert({
+          id: data.user.id, full_name: fullName, phone, role
+        }, { onConflict: 'id' });
+        if (profileError) console.warn('Profile upsert note:', profileError.message);
         await loadAuthenticatedUser(data.session);
         closeAuth();
       } else {
@@ -413,6 +459,7 @@ async function loadAuthenticatedUser(session) {
 
   setRole(role);
   if (role === "WORKER") { await loadWorkerProfile(); }
+  if (role === "CUSTOMER") { await loadMyBookings(); }
 
   document.getElementById("auth-user-label").textContent =
     profile.full_name || session.user.email || "Logged in";
@@ -516,7 +563,7 @@ restoreAuthSession();
     }
 
     function bookWorker(workerId) {
-      const w = WORKERS.find(x => x.id === workerId) || WORKERS[0];
+      const w = allWorkers().find(x => x.id === workerId) || WORKERS[0];
       state.selectedWorker = w;
       state.chatMessages.push({
         sender: "AI",
@@ -556,7 +603,7 @@ if (text === "Confirm Booking") {
       .from("bookings")
       .insert({
         customer_id: user.id,
-        fixer_id: String(w.id),
+        fixer_id: w.isRegisteredWorker ? w.userId : null,
         fixer_name_snapshot: w.name,
         category_snapshot: w.catLabel,
         estimated_rate_pkr: Number(w.hourlyRatePkr) || 0,
@@ -594,6 +641,7 @@ if (text === "Confirm Booking") {
     state.trackingStep = 0;
     render();
     showToast(`Booking #${bookingId} submitted successfully!`);
+    await loadMyBookings();
   } catch (err) {
     console.error("Supabase booking error:", err);
     alert("Booking save nahi hui: " + (err.message || "Please try again."));
@@ -606,7 +654,7 @@ if (text === "Confirm Booking") {
       }
       state.chatMessages.push({ sender: "USER", text });
       diagnoseQuery(text);
-      const matched = WORKERS.filter(w => !state.selectedCategory || w.category === state.selectedCategory)[0] || WORKERS[0];
+      const matched = allWorkers().filter(w => !state.selectedCategory || w.category === state.selectedCategory)[0] || WORKERS[0];
       state.selectedWorker = matched;
       state.chatMessages.push({
         sender: "AI",
@@ -617,7 +665,8 @@ if (text === "Confirm Booking") {
     }
 
     function renderSearch() {
-      const filtered = WORKERS.filter(w => !state.selectedCategory || w.category === state.selectedCategory);
+      const workers = allWorkers();
+      const filtered = workers.filter(w => !state.selectedCategory || normalizeCategory(w.category) === state.selectedCategory || (Array.isArray(w.skills) && w.skills.some(sk => normalizeCategory(sk) === state.selectedCategory)));
       const presets = PRESETS[state.lang] || PRESETS.ROMAN_URDU;
       return `
         <div class="card card-highlight">
@@ -664,7 +713,7 @@ if (text === "Confirm Booking") {
           ${state.selectedCategory ? `<button class="chip" onclick="state.selectedCategory=null;render()">Show All (${WORKERS.length})</button>` : ""}
         </div>
         <div class="chip-row">
-          <button class="chip ${!state.selectedCategory?'active':''}" onclick="state.selectedCategory=null;render()">All Fixers (${WORKERS.length})</button>
+          <button class="chip ${!state.selectedCategory?'active':''}" onclick="state.selectedCategory=null;render()">All Fixers (${workers.length})</button>
           <button class="chip ${state.selectedCategory==='ELECTRICIAN'?'active':''}" onclick="state.selectedCategory='ELECTRICIAN';render()">⚡ Electrician</button>
           <button class="chip ${state.selectedCategory==='AC_REPAIR'?'active':''}" onclick="state.selectedCategory='AC_REPAIR';render()">❄️ AC Repair</button>
           <button class="chip ${state.selectedCategory==='LAPTOP_TECH'?'active':''}" onclick="state.selectedCategory='LAPTOP_TECH';render()">💻 Laptop &amp; PC</button>
@@ -682,7 +731,7 @@ if (text === "Confirm Booking") {
                   <div style="flex:1;">
                     <div style="font-weight:900;font-size:15px;">${w.name} ${w.isVerifiedByAdmin?'<span class="badge-verified">VETTED</span>':''}</div>
                     <div style="font-size:12px;color:var(--muted);">${w.title}</div>
-                    <div style="font-size:12px;color:var(--text);margin-top:2px;">📍 ${w.distanceKm} km • ${w.area}</div>
+                    <div style="font-size:12px;color:var(--text);margin-top:2px;">📍 ${w.distanceKm == null ? "Service area" : w.distanceKm + " km"} • ${w.area}</div>
                   </div>
                   <div style="text-align:right;">
                     <div style="font-weight:900;color:#B45309;">★ ${w.rating}</div>
@@ -697,7 +746,7 @@ if (text === "Confirm Booking") {
                   <div style="font-weight:900;font-size:15px;color:var(--primary-royal);">PKR ${w.hourlyRatePkr}/hr</div>
                 </div>
                 <div style="display:flex;gap:6px;">
-                  <button class="chip" onclick="state.selectedWorker=WORKERS.find(x=>x.id==='${w.id}');setScreen('MAP')">📍 Map</button>
+                  <button class="chip" onclick="state.selectedWorker=allWorkers().find(x=>x.id==='${w.id}');setScreen('MAP')">📍 Map</button>
                   <a class="chip" href="tel:${w.phone}" style="text-decoration:none;">📞 Call</a>
                   <button class="chip active" onclick="bookWorker('${w.id}')">Book via AI</button>
                 </div>
@@ -806,7 +855,28 @@ if (text === "Confirm Booking") {
       `;
     }
 
+    async function loadMyBookings() {
+      if (!state.currentUser || state.currentUser.role !== "CUSTOMER") return;
+      try {
+        const { data, error } = await supabaseClient.from("bookings")
+          .select("id, fixer_name_snapshot, category_snapshot, problem, address, preferred_slot, estimated_rate_pkr, status, created_at")
+          .eq("customer_id", state.currentUser.id).order("created_at", { ascending: false });
+        if (error) throw error;
+        state.bookings = (data || []).map(b => ({
+          id: b.id, workerId: null, workerName: b.fixer_name_snapshot || "Selected fixer",
+          category: b.category_snapshot || "Repair service", problem: b.problem || "Repair request",
+          address: b.address || "Address not provided", slot: b.preferred_slot || "Today ASAP",
+          pkr: Number(b.estimated_rate_pkr) || 0, status: b.status || "PENDING"
+        }));
+        if (state.screen === "BOOKINGS") render();
+      } catch (e) {
+        console.error("Could not load bookings:", e.message);
+        showToast("Bookings load nahi ho sakin. Supabase table/policies check karein.");
+      }
+    }
+
     function renderBookings() {
+      if (!state.bookings.length) return `<div class="card"><h3>My Repair Requests</h3><p style="margin-top:8px;color:var(--muted);font-size:13px;">Abhi koi saved booking nahi hai. Search se fixer select karke booking confirm karein.</p></div>`;
       return `
         <h3 style="margin-bottom:12px;">My Repair Requests (${state.bookings.length})</h3>
         ${state.bookings.map(b => `
@@ -916,6 +986,7 @@ if (text === "Confirm Booking") {
       if (error) { errorBox.textContent = "Profile save nahi hui: " + error.message + " — pehle Supabase SQL setup run karein."; return; }
       state.workerProfile = data;
       state.workerProfileLoaded = true;
+      await loadPublicWorkers();
       render();
       showToast("Worker profile saved successfully!");
     }
@@ -924,7 +995,7 @@ if (text === "Confirm Booking") {
       return `
         <div class="card">
           <h3>🛡️ NEARFIX Admin &amp; Verification Portal (Turbat)</h3>
-          <p style="font-size:12px;color:var(--muted);margin-top:4px;">Verified Workers: ${WORKERS.filter(w=>w.isVerifiedByAdmin).length}/${WORKERS.length} • Active Dispatches: ${state.bookings.length}</p>
+          <p style="font-size:12px;color:var(--muted);margin-top:4px;">Verified Demo Workers: ${WORKERS.filter(w=>w.isVerifiedByAdmin).length}/${WORKERS.length} • Active Dispatches: ${state.bookings.length}</p>
         </div>
         <div class="worker-grid">
           ${WORKERS.map(w => `
@@ -956,6 +1027,7 @@ if (text === "Confirm Booking") {
     }
 
     render();
+    loadPublicWorkers();
   </script>
 </body>
 </html>
