@@ -597,11 +597,25 @@ header {
 
 .role-btn.active-customer,
 .chip.active,
+  
 .btn-primary {
   background: var(--primary-royal);
-  border-color: var(--primary-royal);
+  border: 1px solid var(--primary-royal);
   color: #FFFFFF;
+  border-radius: 12px;
+  padding: 12px 18px;
+  font-weight: 700;
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.12);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
 }
+
+.btn-primary:hover {
+  filter: brightness(1.08);
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.18);
+  transform: translateY(-1px);
+}
+
+
 
 .role-btn.active-worker,
 .btn-violet {
@@ -655,13 +669,32 @@ main {
   border: 1px solid rgba(255,255,255,.2);
 }
 
+
 .search-input {
+  width: 100%;
   min-width: 0;
+  box-sizing: border-box;
   background: #FFFFFF;
+  color: #172B4D;
   border: 1px solid #D4DFE9;
   border-radius: 13px;
   padding: 14px 16px;
+  font-size: 15px;
+  line-height: 1.5;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
+
+.search-input:focus {
+  border-color: var(--primary-royal);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.search-input::placeholder {
+  color: #8A98A9;
+  opacity: 1;
+}
+
 
 .search-input:focus {
   border-color: #21A6A1;
