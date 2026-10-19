@@ -246,25 +246,94 @@
       SOLAR_TECHNICIAN: ['solar','solar technician'],
       APPLIANCE_REPAIR: ['appliance repair','home appliance']
     };
-    function matchesWorkerSearch(w, rawQuery) {
-      const q = String(rawQuery || '').trim().toLowerCase();
-      if (!q) return true;
-      const categoryKey = normalizeCategory(q);
-      const fields = workerSearchText(w);
-      const workerCategory = normalizeCategory(w.category || w.catLabel || '');
-      const skillCategories = (Array.isArray(w.skills) ? w.skills : []).map(normalizeCategory);
-      // When the app has diagnosed a repair description, keep results in its selected service category.
-      if (state.diagnosis && state.selectedCategory && state.diagnosis.category === state.selectedCategory &&
-          (workerCategory === state.selectedCategory || skillCategories.includes(state.selectedCategory))) return true;
-      // Category intent is mapped to a category, so “AC repair” also finds “AC Technician”.
-      if (CATEGORY_TERMS[categoryKey] && (workerCategory === categoryKey || skillCategories.includes(categoryKey))) return true;
-      const aliases = Object.entries(CATEGORY_TERMS).find(([, terms]) => terms.some(term => term === q || (q.length >= 4 && term.includes(q))));
-      if (aliases && (workerCategory === aliases[0] || skillCategories.includes(aliases[0]))) return true;
-      if (fields.includes(q)) return true;
-      // For multiword requests, require every meaningful term to match the profile fields.
-      const words = q.split(/[^a-z0-9\u0600-\u06ff]+/i).filter(x => x.length > 1);
-      return words.length > 0 && words.every(word => fields.includes(word));
+   
+function matchesWorkerSearch(w, rawQuery) {
+  const q = String(rawQuery || '').trim().toLowerCase();
+  if (!q) return true;
+
+  const categoryKey = normalizeCategory(q);
+  const fields = workerSearchText(w).toLowerCase();
+  const workerCategory = normalizeCategory(w.category || w.catLabel || '');
+  const skillCategories = (Array.isArray(w.skills) ? w.skills : [])
+    .map(skill => normalizeCategory(skill));
+
+  // Preserve existing diagnosis-based category matching
+  if (
+    state.diagnosis &&
+    state.selectedCategory &&
+    state.diagnosis.category === state.selectedCategory &&
+    (
+      workerCategory === state.selectedCategory ||
+      skillCategories.includes(state.selectedCategory)
+    )
+  ) return true;
+
+  // Direct category search, e.g. "AC repair" or "Laptop repair"
+  if (
+    CATEGORY_TERMS[categoryKey] &&
+    (
+      workerCategory === categoryKey ||
+      skillCategories.includes(categoryKey)
+    )
+  ) return true;
+
+  const aliases = Object.entries(CATEGORY_TERMS).find(
+    ([, terms]) => terms.some(
+      term => term === q || (q.length >= 4 && term.includes(q))
+    )
+  );
+
+  if (
+    aliases &&
+    (
+      workerCategory === aliases[0] ||
+      skillCategories.includes(aliases[0])
+    )
+  ) return true;
+
+  // Identify the service category from a natural-language problem description
+  const queryRules = [
+    {
+      category: 'LAPTOP_TECH',
+      terms: ['laptop', 'computer', 'screen black', 'screen', 'keyboard']
+    },
+    {
+      category: 'AC_REPAIR',
+      terms: ['ac', 'air conditioner', 'cooling', 'thandi hawa']
+    },
+    {
+      category: 'PLUMBING',
+      terms: ['pipe leak', 'water leak', 'plumbing', 'pani leak', 'plumber']
+    },
+    {
+      category: 'ELECTRICIAN',
+      terms: ['electrician', 'wiring', 'bijli', 'power issue']
     }
+  ];
+
+  const matchedRule = queryRules.find(rule =>
+    rule.terms.some(term => q.includes(term))
+  );
+
+  if (matchedRule) {
+    const categoryMatches =
+      workerCategory === matchedRule.category ||
+      skillCategories.includes(matchedRule.category);
+
+    if (categoryMatches) return true;
+  }
+
+  // Preserve ordinary text search
+  if (fields.includes(q)) return true;
+
+  const words = q
+    .split(/[^a-z0-9\u0600-\u06ff]+/i)
+    .filter(word => word.length > 1);
+
+  return words.length > 0 &&
+    words.every(word => fields.includes(word));
+}
+
     async function loadPublicWorkers(force = false) {
       if (workerRefreshInFlight) return workerRefreshInFlight;
       if (!force && Date.now() - lastWorkerRefreshAt < WORKER_REFRESH_TTL_MS) return;
