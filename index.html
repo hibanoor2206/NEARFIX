@@ -533,12 +533,22 @@ textarea:focus-visible {
 
   }
 
-  .worker-actions {
+    .worker-actions {
     align-items: flex-start;
+    flex-wrap: wrap;
   }
 
   .worker-actions > div:last-child {
+    display: flex;
     flex-wrap: wrap;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .worker-actions > div:last-child .chip {
+    flex: 1 1 auto;
+    text-align: center;
+    justify-content: center;
   }
 
   .bottom-nav-inner {
@@ -795,10 +805,14 @@ main {
   border-color: #21A6A1;
 }
 
+
 .worker-grid {
+  display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 310px), 1fr));
-  gap: 18px;
+  gap: 20px;
+  align-items: stretch;
 }
+
 
 .worker-card {
   min-width: 0;
