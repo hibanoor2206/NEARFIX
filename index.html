@@ -75,63 +75,12 @@
     .hero-banner h1 { font-size: 22px; font-weight: 900; line-height: 1.2; margin-bottom: 4px; }
     .worker-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 14px; }
     .worker-card { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 16px; display: flex; flex-direction: column; justify-content: space-between; }
-   
-.worker-top {
-  display: flex;
-  gap: 14px;
-  align-items: flex-start;
-  flex-wrap: wrap;
-}
-
-.worker-top > div {
-  min-width: 0;
-}
-
-.worker-top .avatar {
-  flex-shrink: 0;
-}
-
-   
-.avatar {
-  width: 50px;
-  height: 50px;
-  min-width: 50px;
-  border-radius: 50%;
-  background: var(--primary-light);
-  color: var(--primary-royal);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 800;
-  font-size: 16px;
-  flex-shrink: 0;
-  border: 2px solid rgba(37, 99, 235, 0.18);
-  box-shadow: 0 3px 8px rgba(15, 23, 42, 0.08);
-}
-
+    .worker-top { display: flex; gap: 12px; align-items: center; }
+    .avatar { width: 48px; height: 48px; border-radius: 50%; background: var(--primary-light); color: var(--primary-royal); display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 16px; flex-shrink: 0; border: 2px solid var(--primary-royal); }
     .badge-verified { background: var(--primary-light); color: var(--primary-royal); font-size: 9px; font-weight: 900; padding: 2px 5px; border-radius: 4px; margin-left: 4px; }
     .badge-avail { background: var(--emerald-light); color: #065F46; font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 6px; }
     .ai-reason-box { background: #F0F9FF; border: 1px solid #BAE6FD; border-radius: 12px; padding: 10px; margin: 10px 0; font-size: 12px; color: #0C4A6E; line-height: 1.4; }
-    
-.worker-actions {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  margin-top: 14px;
-  padding-top: 12px;
-  border-top: 1px solid #E8EDF3;
-  gap: 12px;
-}
-
-.worker-actions > div {
-  min-width: 0;
-}
-
-.worker-actions .chip {
-  white-space: nowrap;
-}
-
+    .worker-actions { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; gap: 8px; }
     .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); border-top: 1px solid var(--border); display: flex; justify-content: center; z-index: 40; }
     .bottom-nav-inner { max-width: 960px; width: 100%; display: flex; }
     .nav-item { flex: 1; padding: 10px 4px; text-align: center; font-size: 11px; font-weight: 700; color: var(--muted); cursor: pointer; border: none; background: none; }
@@ -152,893 +101,6 @@
     .msg-worker { background: #ECFDF5; color: #065F46; border: 1px solid #A7F3D0; align-self: flex-start; }
     .chat-input-bar { display: flex; gap: 8px; padding: 10px; border-top: 1px solid var(--border); background: var(--surface); }
     .toast { position: fixed; bottom: 72px; left: 50%; transform: translateX(-50%); background: #0F172A; color: #fff; padding: 10px 18px; border-radius: 999px; font-size: 12px; font-weight: 700; z-index: 100; display: none; box-shadow: 0 6px 20px rgba(0,0,0,0.25); }
-    
-/* ==========================================
-   NEARFIX PROFESSIONAL UI — VERSION 2
-   Safe visual improvements only
-========================================== */
-
-:root {
-  --primary-royal: #16324F;
-  --primary-dark: #10263D;
-  --primary-light: #DCECF5;
-  --solar-amber: #21A6A1;
-  --solar-amber-light: #DDF7F4;
-  --emerald: #16856B;
-  --emerald-light: #DDF6EB;
-  --ai-violet: #4169A1;
-  --bg: #F4F7FB;
-  --surface: #FFFFFF;
-  --border: #E0E7EF;
-  --text: #172B42;
-  --muted: #6B7C90;
-}
-
-body {
-  background: #F4F7FB;
-  color: #172B42;
-  line-height: 1.6;
-  -webkit-font-smoothing: antialiased;
-}
-
-.app-shell {
-  max-width: 1200px;
-  background: #F4F7FB;
-}
-
-header {
-  background: rgba(255, 255, 255, 0.97);
-  box-shadow: 0 4px 24px rgba(22, 50, 79, 0.07);
-  backdrop-filter: blur(12px);
-}
-
-.topbar {
-  padding: 16px 24px;
-}
-
-.brand-logo {
-  width: 48px;
-  height: 48px;
-  border-radius: 15px;
-  background: linear-gradient(145deg, #16324F, #245879);
-  color: #FFFFFF;
-  box-shadow: 0 6px 16px rgba(22, 50, 79, 0.2);
-}
-
-.brand-title {
-  font-size: 23px;
-  letter-spacing: 0.6px;
-}
-
-.brand-sub {
-  margin-top: 2px;
-  line-height: 1.4;
-}
-
-.ai-badge {
-  background: #DDF7F4;
-  color: #087E79;
-  border-radius: 20px;
-  padding: 4px 9px;
-}
-
-.role-bar {
-  background: #F0F5F9 !important;
-}
-
-main {
-  padding: 28px 24px 110px;
-}
-
-.card {
-  background: #FFFFFF;
-  border: 1px solid #E0E7EF;
-  border-radius: 22px;
-  padding: 24px;
-  margin-bottom: 22px;
-  box-shadow: 0 8px 28px rgba(22, 50, 79, 0.055);
-}
-
-.card-highlight {
-  border: 1px solid #C7E4E5;
-  box-shadow: 0 10px 32px rgba(22, 50, 79, 0.07);
-}
-
-.hero-banner {
-  position: relative;
-  overflow: hidden;
-  background: linear-gradient(125deg, #10263D 0%, #16324F 58%, #168A86 100%);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 26px;
-  padding: 34px;
-  margin: 0 0 24px;
-  box-shadow: 0 16px 36px rgba(22, 50, 79, 0.16);
-}
-
-.hero-banner h1 {
-  max-width: 680px;
-  font-size: clamp(29px, 4vw, 43px);
-  font-weight: 850;
-  letter-spacing: -1px;
-  line-height: 1.16;
-  margin: 20px 0 12px;
-}
-
-.hero-banner > div:last-child {
-  font-size: 14px !important;
-  line-height: 1.8;
-}
-
-.hero-top {
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.hero-pill {
-  background: #B8F0E8;
-  color: #105E5A;
-  padding: 6px 10px;
-  border-radius: 8px;
-}
-
-.hero-loc {
-  background: rgba(255,255,255,0.12);
-  border: 1px solid rgba(255,255,255,0.2);
-  padding: 6px 10px;
-}
-
-.search-input-wrap {
-  gap: 10px;
-}
-
-.search-input {
-  min-width: 0;
-  background: #FFFFFF;
-  border: 1px solid #D4DFE9;
-  border-radius: 14px;
-  padding: 15px 16px;
-  font-size: 14px;
-  transition: border-color .2s, box-shadow .2s;
-}
-
-.search-input:focus {
-  border-color: #21A6A1;
-  box-shadow: 0 0 0 4px rgba(33,166,161,.12);
-}
-
-.btn {
-  min-height: 46px;
-  border-radius: 13px;
-  font-size: 13px;
-  font-weight: 800;
-  transition: transform .2s, box-shadow .2s, filter .2s;
-}
-
-.btn-primary {
-  background: #16324F;
-  border-color: #16324F;
-}
-
-.btn-violet {
-  background: #4169A1;
-}
-
-.btn-emerald {
-  background: #16856B;
-}
-
-.btn-primary:hover,
-.btn-violet:hover,
-.btn-emerald:hover {
-  filter: brightness(1.05);
-  transform: translateY(-2px);
-  box-shadow: 0 7px 16px rgba(22,50,79,.15);
-}
-
-.chip {
-  background: #FFFFFF;
-  border: 1px solid #DCE5ED;
-  border-radius: 11px;
-  padding: 8px 12px;
-  font-size: 12px;
-}
-
-.chip.active {
-  background: #16324F;
-  border-color: #16324F;
-  color: #FFFFFF;
-}
-
-.chip:hover,
-.role-btn:hover {
-  border-color: #21A6A1;
-}
-
-.worker-grid {
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
-  gap: 18px;
-}
-
-.worker-card {
-  min-width: 0;
-  background: #FFFFFF;
-  border: 1px solid #E0E7EF;
-  border-radius: 21px;
-  padding: 20px;
-  box-shadow: 0 6px 22px rgba(22,50,79,.045);
-  transition: transform .2s, box-shadow .2s;
-}
-
-.worker-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 14px 30px rgba(22,50,79,.09);
-}
-
-.avatar {
-  background: #DCECF5;
-  border: 2px solid #C3DDEB;
-  color: #16324F;
-}
-
-.badge-verified {
-  background: #E5EEFA;
-  color: #234F82;
-  border-radius: 5px;
-}
-
-.badge-avail {
-  background: #DDF6EB;
-  color: #12684F;
-  padding: 4px 7px;
-}
-
-.ai-reason-box {
-  background: #EFF9F8;
-  color: #285E61;
-  border-color: #D0ECE8;
-  border-radius: 13px;
-  padding: 12px;
-  line-height: 1.6;
-}
-
-.worker-actions {
-  gap: 12px;
-  flex-wrap: wrap;
-  align-items: center;
-}
-
-.bottom-nav {
-  background: rgba(255,255,255,.98);
-  border-top: 1px solid #DCE5ED;
-  box-shadow: 0 -5px 22px rgba(22,50,79,.07);
-  backdrop-filter: blur(12px);
-}
-
-.bottom-nav-inner {
-  max-width: 1200px;
-}
-
-.nav-item {
-  min-height: 56px;
-  padding: 12px 5px;
-}
-
-.nav-item.active {
-  background: #EAF5F8;
-  color: #16324F;
-}
-
-.chat-box {
-  border-radius: 22px;
-  box-shadow: 0 8px 28px rgba(22,50,79,.06);
-}
-
-.msg-ai {
-  background: #EEF3F8;
-}
-
-.msg-user {
-  background: #16324F;
-}
-
-.msg-worker {
-  background: #DDF6EB;
-  color: #12684F;
-}
-
-button:focus-visible,
-a:focus-visible,
-input:focus-visible,
-select:focus-visible,
-textarea:focus-visible {
-  outline: 3px solid rgba(33,166,161,.55);
-  outline-offset: 3px;
-}
-
-@media (min-width: 900px) {
-  main {
-    padding: 32px 32px 112px;
-  }
-
-  .card-highlight {
-    padding: 28px;
-  }
-}
-
-@media (max-width: 600px) {
-  .topbar {
-    padding: 12px;
-  }
-
-  .brand-logo {
-    width: 40px;
-    height: 40px;
-  }
-
-  .brand-title {
-    font-size: 18px;
-  }
-
-  main {
-    padding: 16px 12px 100px;
-  }
-
-  .card {
-    padding: 17px;
-    border-radius: 18px;
-  }
-
-  .hero-banner {
-    padding: 23px 19px;
-    border-radius: 20px;
-    margin-bottom: 18px;
-  }
-
-  .hero-banner h1 {
-    font-size: 29px;
-    letter-spacing: -.6px;
-  }
-
-  .hero-top {
-    align-items: flex-start;
-  }
-
-  .search-input-wrap {
-    flex-direction: column;
-  }
-
-  .search-input {
-    width: 100%;
-  }
-
-  .worker-grid {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .worker-card {
-  
-.worker-card {
-    padding: 18px;
-    border-radius: 16px;
-    border: 1px solid #E5E7EB;
-    background: #FFFFFF;
-    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
-    transition: box-shadow 0.2s ease, transform 0.2s ease;
-  }
-
-  .worker-card:hover {
-    box-shadow: 0 8px 22px rgba(15, 23, 42, 0.10);
-    transform: translateY(-2px);
-  }
-
-  }
-
-    .worker-actions {
-    align-items: flex-start;
-    flex-wrap: wrap;
-  }
-
-  .worker-actions > div:last-child {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    width: 100%;
-  }
-
-  .worker-actions > div:last-child .chip {
-    flex: 1 1 auto;
-    text-align: center;
-    justify-content: center;
-  }
-
-  .bottom-nav-inner {
-    overflow-x: auto;
-  }
-
-  .nav-item {
-    min-width: 68px;
-    font-size: 10px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    transition: none !important;
-    animation: none !important;
-  }
-}
-
-:root {
-  --primary-royal: #16324F;
-  --primary-dark: #10263D;
-  --primary-light: #DCECF5;
-  --solar-amber: #21A6A1;
-  --solar-amber-light: #DDF7F4;
-  --emerald: #16856B;
-  --emerald-light: #DDF6EB;
-  --ai-violet: #4169A1;
-  --ai-violet-light: #E5EEFA;
-  --bg: #F4F7FB;
-  --surface: #FFFFFF;
-  --border: #E0E7EF;
-  --text: #172B42;
-  --muted: #6B7C90;
-}
-
-* {
-  font-family: Inter, "Segoe UI", Arial, sans-serif;
-}
-
-body {
-  background: var(--bg);
-  color: var(--text);
-  line-height: 1.5;
-}
-
-.app-shell {
-  max-width: 1180px;
-  background: var(--bg);
-}
-
-header {
-  background: rgba(255,255,255,.97);
-  box-shadow: 0 3px 18px rgba(22,50,79,.06);
-}
-
-.topbar {
-  padding: 16px 24px;
-  gap: 14px;
-}
-
-.brand {
-  gap: 12px;
-}
-
-.brand-logo {
-  width: 46px;
-  height: 46px;
-  border-radius: 14px;
-  background: var(--primary-royal);
-  color: #FFFFFF;
-  box-shadow: 0 5px 12px rgba(22,50,79,.18);
-}
-
-.brand-title {
-  color: var(--primary-royal);
-  font-size: 22px;
-  letter-spacing: .7px;
-}
-
-.ai-badge {
-  background: var(--solar-amber-light);
-  color: #087E79;
-  border-radius: 20px;
-  padding: 4px 9px;
-}
-
-.role-bar {
-  padding: 10px 24px !important;
-  background: #F0F5F9 !important;
-  gap: 10px !important;
-}
-
-.role-btn,
-.chip,
-.nav-item,
-.btn {
-  transition: background .2s ease, border-color .2s ease,
-    box-shadow .2s ease, transform .2s ease;
-}
-
-.role-btn {
-  border-radius: 10px;
-}
-
-.role-btn.active-customer,
-.chip.active,
-  
-.btn-primary {
-  background: var(--primary-royal);
-  border: 1px solid var(--primary-royal);
-  color: #FFFFFF;
-  border-radius: 12px;
-  padding: 12px 18px;
-  font-weight: 700;
-  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.12);
-  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
-}
-
-.btn-primary:hover {
-  filter: brightness(1.08);
-  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.18);
-  transform: translateY(-1px);
-}
-
-
-
-.role-btn.active-worker,
-.btn-violet {
-  background: #4169A1;
-  border-color: #4169A1;
-}
-
-.role-btn.active-admin {
-  background: #B54747;
-  border-color: #B54747;
-}
-
-main {
-  padding: 26px 24px 110px;
-}
-
-.card {
-  padding: 22px;
-  border-radius: 20px;
-  border-color: var(--border);
-  box-shadow: 0 6px 22px rgba(22,50,79,.045);
-  margin-bottom: 20px;
-}
-
-.card-highlight {
-  border: 1px solid #C7E4E5;
-}
-
-.hero-banner {
-  background: linear-gradient(125deg, #10263D 0%, #16324F 58%, #168A86 100%);
-  border-radius: 24px;
-  padding: 30px;
-  margin: 22px 0;
-  box-shadow: 0 12px 30px rgba(22,50,79,.13);
-}
-
-.hero-banner h1 {
-  font-size: clamp(26px, 4vw, 38px);
-  max-width: 620px;
-  line-height: 1.2;
-  margin: 14px 0 10px;
-}
-
-.hero-pill {
-  background: #B8F0E8;
-  color: #105E5A;
-}
-
-.hero-loc {
-  background: rgba(255,255,255,.13);
-  border: 1px solid rgba(255,255,255,.2);
-}
-
-
-.search-input {
-  width: 100%;
-  min-width: 0;
-  box-sizing: border-box;
-  background: #FFFFFF;
-  color: #172B4D;
-  border: 1px solid #D4DFE9;
-  border-radius: 13px;
-  padding: 14px 16px;
-  font-size: 15px;
-  line-height: 1.5;
-  outline: none;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.search-input:focus {
-  border-color: var(--primary-royal);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
-}
-
-.search-input::placeholder {
-  color: #8A98A9;
-  opacity: 1;
-}
-
-
-.search-input:focus {
-  border-color: #21A6A1;
-  box-shadow: 0 0 0 3px rgba(33,166,161,.13);
-}
-
-.btn {
-  border-radius: 12px;
-  min-height: 44px;
-}
-
-.btn-primary:hover,
-.btn-violet:hover,
-.btn-emerald:hover {
-  filter: brightness(.94);
-  transform: translateY(-1px);
-}
-
-.btn-emerald {
-  background: #16856B;
-}
-
-
-.chip {
-  border-radius: 10px;
-  border: 1px solid #DCE5ED;
-  padding: 9px 13px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.chip:hover {
-  border-color: var(--primary-royal);
-  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
-}
-
-.chip.active {
-  border-color: var(--primary-royal);
-  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
-}
-
-
-.chip:hover,
-.role-btn:hover {
-  border-color: #21A6A1;
-}
-
-
-.worker-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 310px), 1fr));
-  gap: 20px;
-  align-items: stretch;
-}
-
-
-.worker-card {
-  min-width: 0;
-  padding: 20px;
-  border-radius: 20px;
-  box-shadow: 0 5px 18px rgba(22,50,79,.045);
-  transition: transform .2s ease, box-shadow .2s ease;
-}
-
-.worker-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 26px rgba(22,50,79,.09);
-}
-
-.avatar {
-  background: #DCECF5;
-  color: #16324F;
-  border: 2px solid #C3DDEB;
-}
-
-.badge-verified {
-  background: #E5EEFA;
-  color: #234F82;
-  border-radius: 5px;
-}
-
-.badge-avail {
-  background: #DDF6EB;
-  color: #12684F;
-}
-
-.ai-reason-box {
-  background: #EFF9F8;
-  color: #285E61;
-  border-color: #D0ECE8;
-  border-radius: 12px;
-  line-height: 1.55;
-}
-
-.bottom-nav {
-  background: rgba(255,255,255,.98);
-  border-top: 1px solid #DCE5ED;
-  box-shadow: 0 -5px 22px rgba(22,50,79,.06);
-}
-
-.bottom-nav-inner {
-  max-width: 1180px;
-}
-
-.nav-item {
-  padding: 13px 5px;
-  min-height: 54px;
-}
-
-.nav-item.active {
-  background: #EAF5F8;
-  color: #16324F;
-}
-
-.chat-box {
-  border-radius: 20px;
-  box-shadow: 0 5px 20px rgba(22,50,79,.05);
-}
-
-.msg-ai {
-  background: #EEF3F8;
-}
-
-.msg-user {
-  background: #16324F;
-}
-
-.msg-worker {
-  background: #DDF6EB;
-  color: #12684F;
-}
-
-.radar-box {
-  border-radius: 20px;
-  overflow: hidden;
-}
-
-.checkpoint-row {
-  border-radius: 14px;
-}
-
-#auth-modal > div {
-  border-radius: 22px !important;
-  box-shadow: 0 22px 70px rgba(0,0,0,.24);
-}
-
-#auth-submit-btn {
-  background: #16324F !important;
-  border-radius: 12px !important;
-}
-
-input, select, textarea, button {
-  font: inherit;
-}
-
-button:focus-visible,
-a:focus-visible,
-input:focus-visible,
-select:focus-visible {
-  outline: 3px solid rgba(33,166,161,.55);
-  outline-offset: 2px;
-}
-
-@media (min-width: 900px) {
-  main {
-    padding: 30px 32px 110px;
-  }
-
-  .hero-banner {
-    padding: 36px;
-  }
-}
-
-@media (max-width: 600px) {
-  .topbar {
-    padding: 12px;
-    gap: 8px;
-  }
-
-  .brand-logo {
-    width: 38px;
-    height: 38px;
-  }
-
-  .brand-title {
-    font-size: 18px;
-    gap: 4px;
-  }
-
-  .brand-sub {
-    font-size: 10px;
-  }
-
-  .topbar > button {
-    max-width: 110px;
-    white-space: normal;
-    font-size: 10px;
-  }
-
-  .role-bar {
-    padding: 9px 12px !important;
-    gap: 6px !important;
-  }
-
-  .role-bar .role-btn {
-    padding: 8px 7px;
-    font-size: 11px;
-  }
-
-  main {
-    padding: 14px 12px 100px;
-  }
-
-  .card {
-    padding: 16px;
-    border-radius: 17px;
-  }
-
-  .hero-banner {
-    padding: 21px;
-    border-radius: 19px;
-  }
-
-  .hero-top {
-    align-items: flex-start;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
-
-  .hero-banner h1 {
-    font-size: 27px;
-  }
-
-  .search-input-wrap {
-    flex-wrap: wrap;
-  }
-
-  .worker-grid {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .worker-card {
-    padding: 15px;
-  }
-
-  .worker-actions {
-    align-items: flex-start;
-    flex-wrap: wrap;
-  }
-
-  .worker-actions > div:last-child {
-    flex-wrap: wrap;
-  }
-
-  .bottom-nav-inner {
-    overflow-x: auto;
-  }
-
-  .nav-item {
-    min-width: 68px;
-    font-size: 10px;
-  }
-
-  .chat-box {
-    height: calc(100dvh - 220px);
-    min-height: 400px;
-  }
-
-  .radar-canvas-wrap {
-    height: 230px;
-    overflow: hidden;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    scroll-behavior: auto !important;
-    transition: none !important;
-  }
-}
-
   </style>
 </head>
 <body>
@@ -1139,68 +201,113 @@ select:focus-visible {
       { id: "w_hnd_1", name: "Shah Mir Bugti", category: "GENERAL_HANDYMAN", catLabel: "Handyman", urdu: "عام کاریگر", title: "Multi-skilled Home Maintenance & Assembly Tech", area: "Airport Road, Turbat", distanceKm: 3.2, rating: 4.75, reviewCount: 105, hourlyRatePkr: 900, isAvailableNow: true, isVerifiedByAdmin: true, cnicMasked: "52201-*******-8", phone: "+92 320 8912743", experienceYears: 9, skills: ["Door Lock Cylinder", "Curtain Rods", "Furniture Assembly"], totalJobsCompleted: 290, aiMatchReason: "Reliable all-in-one handyman for diverse household fixes in a single visit." }
     ];
 
-    // Supabase worker profiles are the persistent source for registered workers.
-    // The eight bundled demo workers remain a separate fallback and are never inserted into Supabase.
+    // Registered profiles are merged with the immutable demo list by stable ID.
     let registeredWorkers = [];
-    let publicWorkersLoadError = "";
-    let publicWorkersLoading = true;
+    let workerLoadError = '';
+    let lastWorkerRefreshAt = 0;
+    let workerRefreshInFlight = null;
+    const WORKER_REFRESH_TTL_MS = 30000;
     function allWorkers() {
       const byId = new Map();
-      [...WORKERS, ...registeredWorkers].forEach(w => byId.set(String(w.id), w));
+      // Demo records remain available; a registered account is unique by auth user_id.
+      for (const w of WORKERS) byId.set(String(w.id), w);
+      for (const w of registeredWorkers) byId.set(String(w.id), w);
       return [...byId.values()];
     }
     function normalizeCategory(value) {
-      const v = String(value || '').toLowerCase().replace(/[_-]+/g, ' ');
-      if (/laptop|computer|pc|desktop|notebook/.test(v)) return 'LAPTOP_TECH';
-      if (/air\s*condition|\bac\b|ac repair|hvac/.test(v)) return 'AC_REPAIR';
-      if (/plumb|pipe fitting/.test(v)) return 'PLUMBING';
-      if (/paint|painter/.test(v)) return 'PAINTER';
-      if (/electric|wireman|wiring/.test(v)) return 'ELECTRICIAN';
-      if (/handyman|general/.test(v)) return 'GENERAL_HANDYMAN';
+      const v = String(value || '').toLowerCase().normalize('NFKC').replace(/[_-]+/g, ' ').trim();
+      if (/laptop|computer|\bpc\b|notebook|کمپیوٹر/.test(v)) return 'LAPTOP_TECH';
+      if (/air\s*condition|\bac\b|ac technician|aircon|refrigerat/.test(v)) return 'AC_REPAIR';
+      if (/plumb|sanitary|pipe repair|پلمبر/.test(v)) return 'PLUMBING';
+      if (/paint|painter|رنگ/.test(v)) return 'PAINTER';
+      if (/electric|wireman|electrical|بجلی/.test(v)) return 'ELECTRICIAN';
+      if (/handyman|general maintenance|general repair/.test(v)) return 'GENERAL_HANDYMAN';
+      if (/mechanic|auto repair|vehicle repair/.test(v)) return 'MECHANIC';
+      if (/carpenter|woodwork/.test(v)) return 'CARPENTER';
+      if (/welder|welding/.test(v)) return 'WELDER';
+      if (/solar/.test(v)) return 'SOLAR_TECHNICIAN';
+      if (/appliance/.test(v)) return 'APPLIANCE_REPAIR';
       return String(value || '').toUpperCase().replace(/[^A-Z0-9]+/g, '_');
     }
-    function workerMatchesQuery(worker, query) {
-      const q = String(query || '').trim().toLowerCase();
-      if (!q) return true;
-      const haystack = [worker.name, worker.category, worker.catLabel, worker.title, worker.area,
-        ...(Array.isArray(worker.skills) ? worker.skills : [])].filter(Boolean).join(' ').toLowerCase();
-      const terms = q.split(/\s+/).filter(Boolean);
-      return terms.every(term => haystack.includes(term) ||
-        (term === 'laptop' && /computer|pc/.test(haystack)) ||
-        (term === 'computer' && /laptop|pc/.test(haystack)) ||
-        (term === 'plumber' && /plumbing|pipe/.test(haystack)) ||
-        (term === 'electrician' && /electric|wireman/.test(haystack)));
+    function workerSearchText(w) {
+      const skills = Array.isArray(w.skills) ? w.skills.join(' ') : String(w.skills || '');
+      return [w.name, w.category, w.catLabel, w.title, skills, w.area].filter(Boolean).join(' ').toLowerCase();
     }
-    async function loadPublicWorkers() {
-      publicWorkersLoading = true;
-      publicWorkersLoadError = "";
-      try {
-        const { data, error } = await supabaseClient.from('worker_profiles')
-          .select('user_id, full_name, phone, category, skills, area, hourly_rate_pkr, is_available, profile_complete')
-          .eq('profile_complete', true);
-        if (error) throw error;
-        registeredWorkers = (data || []).map(p => {
-          const skills = Array.isArray(p.skills) ? p.skills : (typeof p.skills === 'string' ? p.skills.split(',').map(x => x.trim()).filter(Boolean) : []);
-          return {
-            id: p.user_id, userId: p.user_id, isRegisteredWorker: true,
+    const CATEGORY_TERMS = {
+      PLUMBING: ['plumber','plumbing','pipe','water leak','leakage','sanitary','tap repair','پلمبر'],
+      AC_REPAIR: ['ac','ac repair','ac technician','air conditioner','air conditioning','cooling','refrigerator','اے سی'],
+      ELECTRICIAN: ['electrician','electric','electrical','wiring','short circuit','بجلی'],
+      LAPTOP_TECH: ['laptop','computer','pc repair','laptop repair','notebook','کمپیوٹر'],
+      PAINTER: ['painter','painting','paint','wall paint','رنگ'],
+      GENERAL_HANDYMAN: ['handyman','general repair','home maintenance'],
+      MECHANIC: ['mechanic','auto repair','vehicle repair'],
+      CARPENTER: ['carpenter','woodwork'],
+      WELDER: ['welder','welding'],
+      SOLAR_TECHNICIAN: ['solar','solar technician'],
+      APPLIANCE_REPAIR: ['appliance repair','home appliance']
+    };
+    function matchesWorkerSearch(w, rawQuery) {
+      const q = String(rawQuery || '').trim().toLowerCase();
+      if (!q) return true;
+      const categoryKey = normalizeCategory(q);
+      const fields = workerSearchText(w);
+      const workerCategory = normalizeCategory(w.category || w.catLabel || '');
+      const skillCategories = (Array.isArray(w.skills) ? w.skills : []).map(normalizeCategory);
+      // When the app has diagnosed a repair description, keep results in its selected service category.
+      if (state.diagnosis && state.selectedCategory && state.diagnosis.category === state.selectedCategory &&
+          (workerCategory === state.selectedCategory || skillCategories.includes(state.selectedCategory))) return true;
+      // Category intent is mapped to a category, so “AC repair” also finds “AC Technician”.
+      if (CATEGORY_TERMS[categoryKey] && (workerCategory === categoryKey || skillCategories.includes(categoryKey))) return true;
+      const aliases = Object.entries(CATEGORY_TERMS).find(([, terms]) => terms.some(term => term === q || (q.length >= 4 && term.includes(q))));
+      if (aliases && (workerCategory === aliases[0] || skillCategories.includes(aliases[0]))) return true;
+      if (fields.includes(q)) return true;
+      // For multiword requests, require every meaningful term to match the profile fields.
+      const words = q.split(/[^a-z0-9\u0600-\u06ff]+/i).filter(x => x.length > 1);
+      return words.length > 0 && words.every(word => fields.includes(word));
+    }
+    async function loadPublicWorkers(force = false) {
+      if (workerRefreshInFlight) return workerRefreshInFlight;
+      if (!force && Date.now() - lastWorkerRefreshAt < WORKER_REFRESH_TTL_MS) return;
+      workerRefreshInFlight = (async () => {
+        try {
+          // Never request phone numbers in the public worker-list query.
+          const { data, error } = await supabaseClient.from('worker_profiles')
+            .select('user_id, full_name, category, skills, area, hourly_rate_pkr, is_available, profile_complete, updated_at')
+            .eq('profile_complete', true).eq('is_available', true);
+          if (error) throw error;
+          registeredWorkers = (data || []).filter(p => p.user_id).map(p => ({
+            id: String(p.user_id), userId: String(p.user_id), isRegisteredWorker: true,
             name: p.full_name || 'NEARFIX Worker', category: normalizeCategory(p.category),
-            catLabel: p.category || 'Skilled Worker', title: skills.join(', ') || p.category || 'Skilled Worker',
-            area: p.area || 'Turbat', distanceKm: null, rating: 0, reviewCount: 0,
+            catLabel: p.category || 'Skilled Worker', title: (Array.isArray(p.skills) ? p.skills : []).join(', ') || p.category || 'Skilled Worker',
+            area: p.area || 'Turbat', distanceKm: null, rating: null, reviewCount: 0,
             hourlyRatePkr: Number(p.hourly_rate_pkr) || 0, isAvailableNow: p.is_available === true,
-            isVerifiedByAdmin: false, phone: p.phone || '', skills,
-            aiMatchReason: 'Registered NEARFIX worker; skills and service area are from the saved profile.'
-          };
-        });
-        if (state.selectedWorker?.isRegisteredWorker) {
-          state.selectedWorker = registeredWorkers.find(w => w.id === state.selectedWorker.id) || state.selectedWorker;
+            isVerifiedByAdmin: false, phone: '', skills: Array.isArray(p.skills) ? p.skills : (p.skills ? [String(p.skills)] : []),
+            aiMatchReason: 'Registered NEARFIX worker; skills and service area are taken from the saved profile.'
+          }));
+          workerLoadError = '';
+          lastWorkerRefreshAt = Date.now();
+          if (state.selectedWorker?.isRegisteredWorker) {
+            state.selectedWorker = registeredWorkers.find(w => w.id === state.selectedWorker.id) || state.selectedWorker;
+          }
+          if (state.screen === 'SEARCH' || state.screen === 'WORKERS') render();
+        } catch (e) {
+          workerLoadError = 'Registered fixers could not be refreshed from Supabase. Please check your connection or access policy, then retry.';
+          console.error('Could not load registered workers from public.worker_profiles:', e);
+          // Keep the last successful registered list and demo workers; never silently treat errors as an empty database.
+          if (state.screen === 'SEARCH' || state.screen === 'WORKERS') render();
+        } finally {
+          workerRefreshInFlight = null;
         }
-      } catch (e) {
-        publicWorkersLoadError = e.message || 'Unknown Supabase error';
-        console.error('Could not load registered workers:', e);
-      } finally {
-        publicWorkersLoading = false;
-        if (state.screen === 'SEARCH' || state.screen === 'WORKERS') render();
-      }
+      })();
+      return workerRefreshInFlight;
+    }
+    function updateWorkerSearch(value) {
+      const input = document.getElementById('search-box');
+      const cursor = input ? input.selectionStart : String(value).length;
+      state.searchQuery = value;
+      render();
+      const next = document.getElementById('search-box');
+      if (next) { next.focus(); try { next.setSelectionRange(cursor, cursor); } catch (_) {} }
     }
 
     const PRESETS = {
@@ -1424,7 +531,6 @@ async function loadAuthenticatedUser(session) {
   setRole(role);
   if (role === "WORKER") { await loadWorkerProfile(); }
   if (role === "CUSTOMER") { await loadMyBookings(); }
-  await loadPublicWorkers();
 
   document.getElementById("auth-user-label").textContent =
     profile.full_name || session.user.email || "Logged in";
@@ -1459,11 +565,7 @@ async function logoutUser() {
   }
 
   state.currentUser = null;
-  state.workerProfile = null;
-  state.workerProfileLoaded = false;
-  state.workerProfileError = "";
   state.role = "CUSTOMER";
-  await loadPublicWorkers();
 
   document.getElementById("auth-user-label").textContent = "Not logged in";
   document.getElementById("auth-login-btn").style.display = "inline-block";
@@ -1504,6 +606,7 @@ restoreAuthSession();
         if (btn) btn.className = "nav-item" + (s === scr ? " active" : "");
       });
       render();
+      if (scr === "SEARCH" || scr === "WORKERS") loadPublicWorkers(true);
     }
 
     function diagnoseQuery(q) {
@@ -1635,22 +738,12 @@ if (text === "Confirm Booking") {
 
     function renderSearch() {
       const workers = allWorkers();
-      const filtered = workers.filter(w =>
-        (!state.selectedCategory || normalizeCategory(w.category) === state.selectedCategory ||
-          (Array.isArray(w.skills) && w.skills.some(sk => normalizeCategory(sk) === state.selectedCategory))) &&
-        workerMatchesQuery(w, state.searchQuery)
-      );
+      const filtered = workers.filter(w => {
+        const categoryMatches = !state.selectedCategory || normalizeCategory(w.category || w.catLabel) === state.selectedCategory || (Array.isArray(w.skills) && w.skills.some(sk => normalizeCategory(sk) === state.selectedCategory));
+        return categoryMatches && matchesWorkerSearch(w, state.searchQuery);
+      });
       const presets = PRESETS[state.lang] || PRESETS.ROMAN_URDU;
       return `
-<div class="hero-banner">
-  <div class="hero-top">
-    <span class="hero-pill">✨ GEMINI AI POWERED</span>
-    <span class="hero-loc">Turbat &amp; Panjgur • تربت</span>
-  </div>
-  <h1>Instant Local Fixers &amp; Fair-Price Diagnostics</h1>
-  <div style="font-size:12px;opacity:0.9;">Electricians • AC Technicians • Laptops • Plumbers • Painters</div>
-</div>
-
         <div class="card card-highlight">
           <div style="font-weight:900;font-size:16px;">⚡ What is the issue at home or shop?</div>
           <div style="font-size:12px;color:var(--muted);">Type naturally in Balochi, Urdu, Roman Urdu, or English</div>
@@ -1658,7 +751,7 @@ if (text === "Confirm Booking") {
             ${["ROMAN_URDU","URDU","BALOCHI","ENGLISH"].map(l => `<button class="chip ${state.lang===l?'active':''}" onclick="state.lang='${l}';render()">${l.replace('_',' ')}</button>`).join("")}
           </div>
           <div class="search-input-wrap">
-            <input id="search-box" class="search-input" value="${state.searchQuery.replace(/"/g,'&quot;')}" oninput="state.searchQuery=this.value" placeholder="e.g. laptop screen black hai or AC cooling nahi kar raha..." />
+            <input id="search-box" class="search-input" value="${escapeHtml(state.searchQuery)}" oninput="updateWorkerSearch(this.value)" placeholder="Search plumber, AC repair, laptop repair, name or area..." />
           </div>
           <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
             <button class="btn btn-primary" style="flex:1;" onclick="diagnoseQuery()">✨ Find a Fixer ⚡</button>
@@ -1681,6 +774,15 @@ if (text === "Confirm Booking") {
           </div>
         ` : ""}
 
+        <div class="hero-banner">
+          <div class="hero-top">
+            <span class="hero-pill">✨ GEMINI AI POWERED</span>
+            <span class="hero-loc">Turbat &amp; Panjgur • تربت</span>
+          </div>
+          <h1>Instant Local Fixers &amp; Fair-Price Diagnostics</h1>
+          <div style="font-size:12px;opacity:0.9;">Electricians • AC Technicians • Laptops • Plumbers • Painters</div>
+        </div>
+
         <div style="display:flex;justify-content:space-between;align-items:center;margin:12px 0 8px;">
           <strong style="font-size:16px;">Explore Trade Categories</strong>
           ${state.selectedCategory ? `<button class="chip" onclick="state.selectedCategory=null;render()">Show All (${workers.length})</button>` : ""}
@@ -1694,10 +796,9 @@ if (text === "Confirm Booking") {
           <button class="chip ${state.selectedCategory==='PAINTER'?'active':''}" onclick="state.selectedCategory='PAINTER';render()">🎨 Painter</button>
         </div>
 
+        ${workerLoadError ? `<div class="card" role="alert" style="border:1px solid #f2b8b5;color:#9b1c1c;margin-top:10px;">${escapeHtml(workerLoadError)} <button class="chip" onclick="loadPublicWorkers(true)">Retry</button></div>` : ""}
         <h3 style="margin:12px 0;">Top Matched Fixers in Turbat (${filtered.length})</h3>
-        ${publicWorkersLoading ? '<p role="status" style="padding:10px;color:var(--muted);">Loading registered workers…</p>' : ''}
-        ${publicWorkersLoadError ? `<p role="alert" style="padding:10px;color:#B42318;background:#FEF3F2;border-radius:10px;margin:8px 0;">Could not load registered worker profiles from Supabase: ${escapeHtml(publicWorkersLoadError)}. Demo workers are still shown; registered workers may be missing until this is resolved.</p>` : ''}
-        ${!publicWorkersLoading && !publicWorkersLoadError && filtered.length === 0 ? '<p style="padding:12px;color:var(--muted);">No fixers match this search. Try another skill or clear the filters.</p>' : ''}
+        ${filtered.length ? '' : `<div class="card"><p>No fixers match this search. Try a service such as Plumber, AC repair, Electrician, or Laptop repair.</p></div>`}
         <div class="worker-grid">
           ${filtered.map(w => `
             <div class="worker-card">
@@ -1710,12 +811,11 @@ if (text === "Confirm Booking") {
                     <div style="font-size:12px;color:var(--text);margin-top:2px;">📍 ${w.distanceKm == null ? "Service area" : w.distanceKm + " km"} • ${w.area}</div>
                   </div>
                   <div style="text-align:right;">
-                    <div style="font-weight:900;color:#B45309;">★ ${w.rating}</div>
-                    <span class="badge-avail">${w.isAvailableNow ? '● Available' : '● Currently unavailable'}</span>
+                    <div style="font-weight:900;color:#B45309;">${Number.isFinite(w.rating) ? `★ ${w.rating}` : 'New worker'}</div>
+                    <span class="badge-avail">● Available</span>
                   </div>
                 </div>
                 <div class="ai-reason-box">✨ <strong>Why matched:</strong> ${w.aiMatchReason}</div>
-                ${w.skills?.length ? `<div style="font-size:12px;color:var(--muted);margin-top:6px;">Skills: ${w.skills.map(escapeHtml).join(', ')}</div>` : ''}
               </div>
               <div class="worker-actions">
                 <div>
@@ -1724,7 +824,7 @@ if (text === "Confirm Booking") {
                 </div>
                 <div style="display:flex;gap:6px;">
                   <button class="chip" onclick="state.selectedWorker=allWorkers().find(x=>x.id==='${w.id}');setScreen('MAP')">📍 Map</button>
-                  <a class="chip" href="tel:${w.phone}" style="text-decoration:none;">📞 Call</a>
+                  ${w.isRegisteredWorker ? '' : `<a class="chip" href="tel:${w.phone}" style="text-decoration:none;">📞 Call</a>`}
                   <button class="chip active" onclick="bookWorker('${w.id}')">Book via AI</button>
                 </div>
               </div>
@@ -1882,10 +982,8 @@ if (text === "Confirm Booking") {
       if (error) {
         console.error("Worker profile load error:", error.message);
         state.workerProfile = null;
-        state.workerProfileError = error.message;
       } else {
         state.workerProfile = data;
-        state.workerProfileError = "";
       }
       state.workerProfileLoaded = true;
       if (state.role === "WORKER") render();
@@ -1921,7 +1019,6 @@ if (text === "Confirm Booking") {
             <label for="wp-rate">Hourly rate (PKR)</label>
             <input id="wp-rate" type="number" min="0" max="1000000" required value="${p.hourly_rate_pkr ?? ""}" placeholder="e.g. 900" style="width:100%;padding:11px;border:1px solid var(--border);border-radius:10px;margin:5px 0 12px;" />
             <label style="display:flex;align-items:center;gap:9px;margin:4px 0 16px;"><input id="wp-available" type="checkbox" ${p.is_available !== false ? "checked" : ""}/> I am currently available for jobs</label>
-            ${state.workerProfileError ? `<p role="alert" style="color:#b42318;font-size:13px;white-space:pre-wrap;margin-bottom:8px;">Could not load your saved profile: ${escapeHtml(state.workerProfileError)}</p>` : ''}
             <p id="wp-error" role="alert" style="color:#b42318;font-size:13px;white-space:pre-wrap;margin-bottom:8px;"></p>
             <button class="btn btn-primary" type="submit">${setup ? "Save Profile & Continue" : "Save Profile Changes"}</button>
           </form>
@@ -1947,14 +1044,6 @@ if (text === "Confirm Booking") {
       const category = document.getElementById("wp-category").value;
       if (!skills.length) { errorBox.textContent = "Please select at least one skill."; return; }
       if (!skills.includes(category)) skills.push(category);
-      const fullName = document.getElementById("wp-name").value.trim();
-      const phone = document.getElementById("wp-phone").value.trim();
-      const area = document.getElementById("wp-area").value.trim();
-      const rate = Number(document.getElementById("wp-rate").value);
-      if (!fullName || !phone || !area || !Number.isFinite(rate) || rate < 0) {
-        errorBox.textContent = "Enter a valid name, phone, service area, and non-negative hourly rate.";
-        return;
-      }
       const payload = {
         user_id: state.currentUser.id,
         full_name: document.getElementById("wp-name").value.trim(),
@@ -1967,27 +1056,25 @@ if (text === "Confirm Booking") {
         profile_complete: true,
         updated_at: new Date().toISOString()
       };
-      const submitButton = document.querySelector('#worker-profile-form button[type="submit"]');
-      if (submitButton) { submitButton.disabled = true; submitButton.textContent = "Saving…"; }
-      try {
-        const { data, error } = await supabaseClient.from("worker_profiles")
-          .upsert(payload, { onConflict: "user_id" })
-          .select("user_id, full_name, phone, category, skills, area, hourly_rate_pkr, is_available, profile_complete")
-          .single();
-        if (error) throw error;
-        state.workerProfile = data;
-        state.workerProfileLoaded = true;
-        state.workerProfileError = "";
-        await loadPublicWorkers();
-        render();
-        showToast("Worker profile saved successfully!");
-      } catch (error) {
-        errorBox.textContent = "Profile save failed: " + (error.message || "Unknown Supabase error");
-        console.error("Worker profile save error:", error);
-      } finally {
-        const button = document.querySelector('#worker-profile-form button[type="submit"]');
-        if (button) { button.disabled = false; button.textContent = state.workerProfile?.profile_complete ? "Save Profile Changes" : "Save Profile & Continue"; }
+      const { data, error } = await supabaseClient.from("worker_profiles")
+        .upsert(payload, { onConflict: "user_id" })
+        .select("user_id, full_name, phone, category, skills, area, hourly_rate_pkr, is_available, profile_complete")
+        .single();
+      if (error) {
+        console.error("Supabase worker profile upsert failed:", error);
+        errorBox.textContent = "Profile save nahi hui: " + error.message + ". Check login, table permissions, and worker_profiles RLS policies.";
+        return;
       }
+      if (!data || data.user_id !== state.currentUser.id) {
+        console.error("Worker profile upsert returned no matching saved row:", data);
+        errorBox.textContent = "Supabase ne save confirm nahi ki. Please dobara try karein.";
+        return;
+      }
+      state.workerProfile = data;
+      state.workerProfileLoaded = true;
+      await loadPublicWorkers(true);
+      render();
+      showToast("Worker profile saved successfully!");
     }
 
     function renderAdminRole() {
@@ -2026,7 +1113,14 @@ if (text === "Confirm Booking") {
     }
 
     render();
-    loadPublicWorkers();
+    loadPublicWorkers(true);
+    // Refresh at most once per 30 seconds when the customer returns to the tab.
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden && (state.screen === 'SEARCH' || state.screen === 'WORKERS')) loadPublicWorkers(false);
+    });
+    window.addEventListener('focus', () => {
+      if (state.screen === 'SEARCH' || state.screen === 'WORKERS') loadPublicWorkers(false);
+    });
   </script>
 </body>
 </html>
