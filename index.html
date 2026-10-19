@@ -1478,6 +1478,15 @@ if (text === "Confirm Booking") {
       const filtered = workers.filter(w => !state.selectedCategory || normalizeCategory(w.category) === state.selectedCategory || (Array.isArray(w.skills) && w.skills.some(sk => normalizeCategory(sk) === state.selectedCategory)));
       const presets = PRESETS[state.lang] || PRESETS.ROMAN_URDU;
       return `
+<div class="hero-banner">
+  <div class="hero-top">
+    <span class="hero-pill">✨ GEMINI AI POWERED</span>
+    <span class="hero-loc">Turbat &amp; Panjgur • تربت</span>
+  </div>
+  <h1>Instant Local Fixers &amp; Fair-Price Diagnostics</h1>
+  <div style="font-size:12px;opacity:0.9;">Electricians • AC Technicians • Laptops • Plumbers • Painters</div>
+</div>
+
         <div class="card card-highlight">
           <div style="font-weight:900;font-size:16px;">⚡ What is the issue at home or shop?</div>
           <div style="font-size:12px;color:var(--muted);">Type naturally in Balochi, Urdu, Roman Urdu, or English</div>
@@ -1507,15 +1516,6 @@ if (text === "Confirm Booking") {
             <p style="font-size:12px;color:var(--coral);margin-top:6px;">⚠️ <strong>Safety Tip:</strong> ${state.diagnosis.safety}</p>
           </div>
         ` : ""}
-
-        <div class="hero-banner">
-          <div class="hero-top">
-            <span class="hero-pill">✨ GEMINI AI POWERED</span>
-            <span class="hero-loc">Turbat &amp; Panjgur • تربت</span>
-          </div>
-          <h1>Instant Local Fixers &amp; Fair-Price Diagnostics</h1>
-          <div style="font-size:12px;opacity:0.9;">Electricians • AC Technicians • Laptops • Plumbers • Painters</div>
-        </div>
 
         <div style="display:flex;justify-content:space-between;align-items:center;margin:12px 0 8px;">
           <strong style="font-size:16px;">Explore Trade Categories</strong>
